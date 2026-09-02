@@ -1,0 +1,2546 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>리더톡 · 현장 위주 리더십 챗봇</title>
+<style>
+  :root{
+    --navy:#0F2E6E; --blue:#1F63E8; --aqua:#17B8C4; --orange:#F26A21;
+    --blue-soft:#EAF1FE; --aqua-soft:#E3F7F9; --orange-soft:#FEF0E8;
+    --ink:#12172B; --sub:#5C6480; --faint:#9AA2BC;
+    --bg:#F7F8FC; --card:#FFF; --line:#E9ECF5; --fill:#F1F3FA;
+    --font:'Pretendard','Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{font-family:var(--font);background:var(--bg);color:var(--ink);
+    display:flex;flex-direction:column;-webkit-font-smoothing:antialiased;overscroll-behavior:none}
+
+  /* ── 상단바 ── */
+  header{display:flex;align-items:center;justify-content:space-between;
+    padding:14px 18px;flex-shrink:0}
+  .logo{display:flex;align-items:center;gap:9px}
+  .mark{width:26px;height:26px;border-radius:9px;
+    background:linear-gradient(135deg,var(--blue),var(--aqua));
+    display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:900}
+  .logo b{font-size:15px;letter-spacing:-.01em}
+  header button{font-family:var(--font);background:var(--fill);border:none;font-size:12.5px;
+    font-weight:700;color:var(--sub);cursor:pointer;padding:7px 13px;border-radius:99px;visibility:hidden}
+
+  main{flex:1;overflow-y:auto;width:100%}
+  .wrap{max-width:600px;margin:0 auto;padding:0 16px 24px}
+
+  /* ── 랜딩 ── */
+  .land{min-height:calc(100vh - 120px);display:flex;flex-direction:column;
+    justify-content:center;padding:20px 16px 40px;max-width:600px;margin:0 auto}
+  .hi{font-size:13px;font-weight:800;color:var(--blue);letter-spacing:.06em;margin-bottom:14px}
+  .land h1{font-size:34px;line-height:1.28;letter-spacing:-.03em;font-weight:800;margin-bottom:18px}
+  .land h1 .g{background:linear-gradient(120deg,var(--blue),var(--aqua));
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .land .lead{font-size:15px;line-height:1.75;color:var(--sub);margin-bottom:12px}
+  .kit{background:var(--card);border-radius:20px;padding:16px 18px;margin-bottom:26px;
+    border:1px solid var(--line)}
+  .kit p{font-size:13px;color:var(--sub);line-height:1.6;margin-bottom:10px}
+  .kit ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+  .kit li{font-size:13.5px;font-weight:600;display:flex;gap:8px;align-items:flex-start;line-height:1.5}
+  .kit li i{font-style:normal;flex-shrink:0}
+
+  .bigbox{background:var(--card);border-radius:26px;border:1.5px solid var(--line);
+    padding:8px 8px 8px 20px;display:flex;align-items:flex-end;gap:10px;
+    box-shadow:0 8px 30px rgba(18,23,43,.07);transition:border-color .15s}
+  .bigbox:focus-within{border-color:var(--blue)}
+  .bigbox textarea{flex:1;font-family:var(--font);font-size:15.5px;line-height:1.6;color:var(--ink);
+    border:none;background:transparent;padding:14px 0;resize:none;outline:none;max-height:150px}
+  .go{width:40px;height:40px;border-radius:50%;border:none;flex-shrink:0;margin-bottom:4px;
+    background:var(--fill);color:var(--faint);font-size:17px;font-weight:800;cursor:default;line-height:1}
+  .go.on{background:linear-gradient(135deg,var(--blue),var(--aqua));color:#fff;cursor:pointer}
+
+  .exs{display:flex;gap:7px;flex-wrap:wrap;margin-top:16px}
+  .exs button{font-family:var(--font);font-size:12.5px;font-weight:600;color:var(--sub);
+    background:var(--card);border:1px solid var(--line);padding:9px 14px;border-radius:99px;cursor:pointer}
+  .exs button:hover{border-color:var(--blue);color:var(--blue)}
+
+  /* ── 채팅 ── */
+  .row{display:flex;gap:9px;margin-bottom:16px;align-items:flex-start}
+  .av{width:28px;height:28px;border-radius:10px;flex-shrink:0;margin-top:2px;
+    background:linear-gradient(135deg,var(--blue),var(--aqua));
+    display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:900}
+  .bot{background:var(--card);border-radius:6px 18px 18px 18px;padding:13px 16px;max-width:82%;
+    font-size:15px;line-height:1.7;white-space:pre-wrap;box-shadow:0 1px 3px rgba(18,23,43,.05)}
+  .me-row{display:flex;justify-content:flex-end;margin-bottom:16px}
+  .me{background:var(--navy);border-radius:18px 6px 18px 18px;padding:13px 16px;max-width:82%;
+    font-size:15px;line-height:1.7;color:#fff;white-space:pre-wrap}
+  .chips{display:flex;gap:7px;flex-wrap:wrap;margin:-6px 0 16px 37px}
+  .chips button{font-family:var(--font);font-size:12.5px;font-weight:700;color:var(--blue);
+    background:var(--blue-soft);border:none;padding:9px 14px;border-radius:99px;cursor:pointer}
+  .typing{background:var(--card);border-radius:6px 18px 18px 18px;padding:15px 17px;display:flex;gap:5px;
+    box-shadow:0 1px 3px rgba(18,23,43,.05)}
+  .typing i{width:6px;height:6px;border-radius:50%;background:var(--faint);animation:bl 1.2s infinite}
+  .typing i:nth-child(2){animation-delay:.18s}
+  .typing i:nth-child(3){animation-delay:.36s}
+  @keyframes bl{0%,60%,100%{opacity:.25}30%{opacity:1}}
+
+  .composer{padding:10px 16px calc(14px + env(safe-area-inset-bottom));background:var(--bg);
+    border-top:1px solid var(--line);flex-shrink:0}
+  .composer .inner{max-width:600px;margin:0 auto;display:flex;align-items:flex-end;gap:8px;
+    background:var(--card);border-radius:24px;padding:7px 7px 7px 18px;border:1.5px solid var(--line)}
+  .composer .inner:focus-within{border-color:var(--blue)}
+  .composer textarea{flex:1;font-family:var(--font);font-size:15px;line-height:1.6;color:var(--ink);
+    border:none;background:transparent;padding:9px 0;resize:none;outline:none;max-height:120px}
+  .send{width:36px;height:36px;border-radius:50%;border:none;background:var(--fill);color:var(--faint);
+    font-size:16px;font-weight:800;flex-shrink:0;line-height:1;cursor:default}
+  .send.on{background:linear-gradient(135deg,var(--blue),var(--aqua));color:#fff;cursor:pointer}
+
+  /* ── 결과 ── */
+  .card{background:var(--card);border-radius:22px;padding:20px;margin-bottom:12px;
+    box-shadow:0 1px 3px rgba(18,23,43,.05)}
+  .sect{display:flex;align-items:baseline;justify-content:space-between;padding:0 4px;margin:22px 0 11px}
+  .sect b{font-size:15px;letter-spacing:-.01em}
+  .sect span{font-size:12px;color:var(--faint)}
+
+  .hero{background:linear-gradient(140deg,var(--navy),#1B4CA8 60%,var(--blue));
+    box-shadow:0 10px 30px rgba(15,46,110,.24)}
+  .hero .eb{font-size:11.5px;font-weight:800;letter-spacing:.12em;color:var(--aqua);margin-bottom:11px}
+  .hero .pt{font-size:16.5px;line-height:1.65;color:#fff;font-weight:600;margin-bottom:16px;letter-spacing:-.01em}
+  .hero .tag{display:inline-block;font-size:12px;font-weight:700;color:#fff;
+    background:rgba(255,255,255,.18);padding:5px 12px;border-radius:99px}
+  .hero .dv{border-top:1px solid rgba(255,255,255,.18);margin-top:16px;padding-top:15px}
+  .hero h5{font-size:11.5px;font-weight:800;color:var(--aqua);margin-bottom:8px}
+  .hero p{font-size:13.5px;line-height:1.75;color:#E4EBFA}
+
+  .opt{padding:0;overflow:hidden;border:1.5px solid transparent;transition:border-color .15s}
+  .opt.on{border-color:var(--blue)}
+  .opt>button{width:100%;text-align:left;font-family:var(--font);background:none;border:none;
+    padding:20px;cursor:pointer;display:block}
+  .tags{display:flex;align-items:center;gap:8px;margin-bottom:9px;flex-wrap:wrap}
+  .tag{font-size:11.5px;font-weight:800;padding:5px 11px;border-radius:99px}
+  .tag.mint{color:#0E8A93;background:var(--aqua-soft)}
+  .tag.amber{color:#B65A12;background:var(--orange-soft)}
+  .tag.coral{color:#C4432E;background:#FCEBE7}
+  .basis{font-size:11.5px;color:var(--faint)}
+  .head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+  .head b{font-size:16px;line-height:1.45;letter-spacing:-.01em}
+  .chev{font-size:17px;color:var(--faint);line-height:1;transition:transform .2s;flex-shrink:0;margin-top:3px}
+  .opt.on .chev{transform:rotate(180deg)}
+  .adesc{font-size:13px;color:var(--sub);line-height:1.55;margin-top:7px}
+  .body{padding:0 20px 20px}
+  .note{background:var(--orange-soft);color:#B4400F;font-size:13px;font-weight:700;
+    border-radius:14px;padding:12px 14px;line-height:1.6;margin-bottom:15px}
+
+  .first{background:var(--ink);border-radius:18px;padding:17px;margin-bottom:15px}
+  .first .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+  .first .lbl{font-size:11.5px;font-weight:800;color:#8891AE;letter-spacing:.06em}
+  .first .copy{font-family:var(--font);font-size:12px;font-weight:700;color:#C3C9DC;
+    background:rgba(255,255,255,.1);border:none;border-radius:99px;padding:7px 13px;cursor:pointer}
+  .first .copy.done{color:var(--aqua)}
+  .first .txt{font-size:16px;font-weight:700;color:#fff;line-height:1.7}
+
+  .stat{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+  .stat span{font-size:11.5px;font-weight:700;background:var(--fill);color:var(--sub);
+    padding:6px 11px;border-radius:99px}
+  .src{font-size:11.5px;color:var(--faint);line-height:1.6;text-align:center;margin:14px 6px 0}
+  .kv{margin-bottom:14px}
+  .kv:last-child{margin-bottom:0}
+  .kv b{display:block;font-size:11.5px;font-weight:800;color:var(--blue);margin-bottom:5px}
+  .kv p{font-size:14px;color:var(--sub);line-height:1.75}
+  .more{margin-top:16px;padding-top:15px;border-top:1px solid var(--line)}
+  .more h6{font-size:11.5px;font-weight:800;color:var(--faint);letter-spacing:.06em;margin-bottom:9px}
+  .mini{font-size:13px;color:var(--sub);line-height:1.6;padding:8px 0;border-bottom:1px dashed var(--line)}
+  .mini:last-child{border-bottom:none}
+  .mini b{font-weight:800;color:var(--ink)}
+
+  .pr{padding-bottom:15px;margin-bottom:15px;border-bottom:1px solid var(--line)}
+  .pr:last-child{padding-bottom:0;margin-bottom:0;border-bottom:none}
+  .pr b{display:block;font-size:15px;margin-bottom:4px}
+  .pr p{font-size:13.5px;color:var(--sub);line-height:1.6}
+  .soft{background:var(--fill);box-shadow:none}
+  .soft b{display:block;font-size:15.5px;margin-bottom:6px}
+  .soft p{font-size:13.5px;color:var(--sub);line-height:1.7}
+  .hrbox{background:var(--blue-soft);box-shadow:none}
+  .hrbox b{display:block;font-size:15px;color:var(--navy);margin-bottom:5px}
+  .hrbox p{font-size:13.5px;color:var(--navy);line-height:1.65;opacity:.82}
+  .contrib{background:var(--ink);box-shadow:none}
+  .contrib b{display:block;font-size:15px;color:#fff;margin-bottom:6px}
+  .contrib p{font-size:13.5px;color:#A6ADC6;line-height:1.65}
+
+  .actions{display:flex;gap:8px;margin-top:14px}
+  .actions button{flex:1;height:50px;border-radius:16px;font-family:var(--font);
+    font-size:14.5px;font-weight:700;cursor:pointer;border:1.5px solid var(--line);
+    background:var(--card);color:var(--ink)}
+  .actions button.pri{border:none;background:linear-gradient(135deg,var(--blue),var(--aqua));color:#fff}
+
+  .spinner{width:34px;height:34px;border-radius:50%;border:3px solid var(--line);
+    border-top-color:var(--blue);margin:0 auto 18px;animation:sp .8s linear infinite}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  .load{padding:130px 0;text-align:center}
+  .load .t{font-size:14.5px;font-weight:700}
+  footer{padding:12px 18px calc(18px + env(safe-area-inset-bottom));text-align:center;
+    font-size:11.5px;color:var(--faint);line-height:1.7;flex-shrink:0}
+  .hidden{display:none !important}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span class="mark">L</span><b>리더톡</b></div>
+  <button id="restart">새 대화</button>
+</header>
+
+<main id="main"></main>
+
+<div class="composer hidden" id="composer">
+  <div class="inner">
+    <textarea id="draft" rows="1" placeholder="이어서 적어주세요"></textarea>
+    <button class="send" id="send">↑</button>
+  </div>
+</div>
+
+<footer id="foot">수집된 리더 경험 사례로 답합니다 · 이름과 회사명은 적지 말아주세요</footer>
+
+<script>
+window.CASES = {
+ "meta": {
+  "version": "1.0",
+  "totalCount": 63,
+  "realCount": 13,
+  "syntheticCount": 50,
+  "notice": "실제 수집 사례와 이를 바탕으로 보강한 사례를 함께 사용합니다. 모든 사례는 동일한 서술 형식으로 정리했습니다.",
+  "privacy": "설문 응답자의 전화번호 등 개인정보는 포함하지 않습니다.",
+  "approaches": [
+   {
+    "key": "A",
+    "name": "사정을 먼저 듣는다",
+    "desc": "원인과 맥락 확인이 먼저. 기준은 그 뒤에."
+   },
+   {
+    "key": "B",
+    "name": "기준을 먼저 말한다",
+    "desc": "사실·규칙·기대치를 먼저 제시하고 시작."
+   },
+   {
+    "key": "C",
+    "name": "구조를 바꾼다",
+    "desc": "대화로 풀지 않고 역할·절차·배분을 다시 짠다."
+   },
+   {
+    "key": "D",
+    "name": "리더가 먼저 움직인다",
+    "desc": "말보다 리더가 먼저 부담을 지고 움직인다."
+   },
+   {
+    "key": "E",
+    "name": "묻는 방식을 바꾼다",
+    "desc": "질문의 범위나 순서를 바꿔 답이 나오게 한다."
+   },
+   {
+    "key": "F",
+    "name": "선을 긋는다",
+    "desc": "경고·거절로 명확한 경계를 만든다."
+   }
+  ],
+  "toneNormalized": true
+ },
+ "cases": [
+  {
+   "id": "R01",
+   "source": "real",
+   "type": "소통·회의",
+   "org": {
+    "industry": "교육/연구/컨설팅",
+    "companySize": "50인 이상 ~ 300인 미만",
+    "teamSize": "10인 이상 ~ 20인 미만"
+   },
+   "situation": "회의에서 의견을 물으면 팀원들이 선뜻 답하지 않고 침묵이 이어졌다. 개방형 질문을 던질 때마다 같은 상황이 반복됐다.",
+   "action": "질문을 열어두는 대신 두 가지 선택지를 제시하거나 예·아니오로 답할 수 있게 물었다. 답이 나오면 이어서 이유를 물었다.",
+   "reason": "범위가 지나치게 넓은 질문에는 답을 꺼린다고 봤다.",
+   "dialogue": "“시험 감독을 할 때 7교시를 들어가는 게 부담임이 들어가는게 좋을까요? 아니면 그냥 기존대로 하는게 나을까요?”",
+   "firstLine": "시험 감독 7교시 배정을 조정하는 게 좋을까요, 기존대로 가는 게 나을까요?",
+   "reaction": "둘 중 하나를 골라 답하기 시작했고, 곧 이유까지 덧붙였다.",
+   "outcome": "positive",
+   "outcomeDetail": "이후 회의에서 스스로 의견을 내거나 반대 입장에서 생각해보는 모습이 나타났다.",
+   "lesson": "침묵은 의견이 없어서가 아니라 답의 범위가 넓어서일 때가 많다.",
+   "approachKey": "E",
+   "approach": "묻는 방식을 바꾼다",
+   "approachDesc": "질문의 범위나 순서를 바꿔 답이 나오게 한다."
+  },
+  {
+   "id": "R02",
+   "source": "real",
+   "type": "업무 분장",
+   "org": {
+    "industry": "교육/연구/컨설팅",
+    "companySize": "50인 이상 ~ 300인 미만",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "4인 팀에서 역량이 부족한 팀원 때문에 다른 팀원이 직접 불만을 제기했다. 지적받은 쪽도 감정이 상해 팀이 와해될 상황이었다.",
+   "action": "불만을 제기한 팀원을 먼저 진정시키고 기한이 정해진 과제임을 상기시켰다. 문제 팀원의 실질 비중은 줄이되 발표와 자료조사를 맡겨 역할의 무게는 남겼다.",
+   "reason": "그냥 배제하면 불화가 커지고, 비중을 유지하면 갈등이 계속될 상황이었다.",
+   "dialogue": "ㅇㅇ님, ㅇㅇ님이 발표랑 자료조사를 맡아주시겠어요? 확실한 근거가 있어야 보고서가 설득력 있을 것 같아서, 최대한 구체적으로 많이 사례를 찾아주셨으면 좋겠어요. 저희는 나머지 일을 하고 자료를 찾아주시면 발표 자료를 만들게요. 발표 자료 만드는 사이에 발표 준비를 해 주시면 감사하겠습니다. 마지막 발표가 제일 중요하니까요. 라는 식으로 얘기한 걸로 기억합니다.",
+   "firstLine": "ㅇㅇ님이 발표랑 자료조사를 맡아주시겠어요? 마지막 발표가 제일 중요하니까요.",
+   "reaction": "불만을 제기했던 팀원은 부담이 줄어 만족했고, 문제 팀원도 자기 역할이 있다는 점에 만족했다.",
+   "outcome": "positive",
+   "outcomeDetail": "기한 안에 과제를 마무리했고 남은 구성원들도 각자 역할에 만족했다.",
+   "lesson": "배제는 갈등을 키운다. 비중은 줄이되 의미는 남긴다.",
+   "approachKey": "C",
+   "approach": "구조를 바꾼다",
+   "approachDesc": "대화로 풀지 않고 역할·절차·배분을 다시 짠다."
+  },
+  {
+   "id": "R03",
+   "source": "real",
+   "type": "근태",
+   "org": {
+    "industry": "서비스/식음료/숙박",
+    "companySize": "10인 미만",
+    "teamSize": "5인 미만"
+   },
+   "situation": "매장 직원의 반복되는 지각과 업무 태도에 피드백이 필요한 상황이었다. 곧바로 지적하기는 어려웠다.",
+   "action": "일방적으로 지적하는 대신 최근 근무 환경과 업무상 어려움을 먼저 경청했다. 질문을 던져 원인을 확인한 뒤 맞춤형으로 피드백했다.",
+   "reason": "원인을 모른 채 비난부터 하면 감정 대립이 생겨 매장 분위기가 상할 것이라고 봤다.",
+   "dialogue": "요즘 매장 업무를 진행하면서 특별히 힘들거나 적응하기 어려운 부분이 있으신가요? 출근이나 작업 시간 관련해서 제가 도와드릴 수 있는 부분이 있는지 먼저 이야기 나누고 싶습니다.",
+   "firstLine": "요즘 매장 업무 하시면서 특별히 힘들거나 적응하기 어려운 부분 있으신가요?",
+   "reaction": "처음에는 당황했으나 질책이 아니라는 점을 느끼고 솔직한 사정과 애로사항을 털어놓았다.",
+   "outcome": "positive",
+   "outcomeDetail": "이후 지각과 업무 실수가 크게 줄었고, 매장 전체의 소통 분위기와 협업 효율이 함께 올라갔다.",
+   "lesson": "지적보다 원인 파악이 먼저다. 질책이 아니라고 느끼면 사정을 말한다.",
+   "approachKey": "A",
+   "approach": "사정을 먼저 듣는다",
+   "approachDesc": "원인과 맥락 확인이 먼저. 기준은 그 뒤에."
+  },
+  {
+   "id": "R04",
+   "source": "real",
+   "type": "과부하",
+   "org": {
+    "industry": "유통/물류/운송/무역",
+    "companySize": "300인 이상 ~ 1,000인 미만",
+    "teamSize": "20인 이상 ~ 50인 미만"
+   },
+   "situation": "한여름 야외 제초 작업이 이어지며 팀 전체가 지쳐 진도가 나가지 않았다.",
+   "action": "리더가 먼저 작업을 시작했다. 중간에 아이스크림을 사서 나누며 짧게 쉬는 시간을 만들었다.",
+   "reason": "지친 상태에서 독려하는 말은 효과가 없다고 봤다.",
+   "dialogue": "다들 먹고 싶은 아이스크림 있어? 아이스크림 하나씩 먹으면서 좀 쉬고 하자~",
+   "firstLine": "다들 먹고 싶은 아이스크림 있어? 하나씩 먹으면서 좀 쉬고 하자.",
+   "reaction": "가라앉아 있던 분위기가 눈에 띄게 살아났다.",
+   "outcome": "positive",
+   "outcomeDetail": "휴식 뒤 작업 속도가 올라 다른 부서보다 먼저 마쳤다.",
+   "lesson": "말보다 리더가 먼저 움직이고 쉼을 주는 편이 빠를 때가 있다.",
+   "approachKey": "D",
+   "approach": "리더가 먼저 움직인다",
+   "approachDesc": "말보다 리더가 먼저 부담을 지고 움직인다."
+  },
+  {
+   "id": "R05",
+   "source": "real",
+   "type": "업무 실수",
+   "org": {
+    "industry": "서비스/식음료/숙박",
+    "companySize": "10인 이상 ~ 50인 미만",
+    "teamSize": "5인 미만"
+   },
+   "situation": "팀원이 근무 중 실수로 문제를 일으켜 휴무일인 리더에게 연락해왔다. 팀원은 크게 당황한 상태였다.",
+   "action": "전화로 무슨 일이 있었는지 먼저 듣고 상황을 확인했다. 처리 방법을 단계별로 알려준 뒤 해결됐는지 다시 확인했다.",
+   "reason": "당황한 상태에서 잘못부터 지적하면 다음부터 숨길 것이라고 봤다.",
+   "dialogue": "\"실수해도 괜찮으니까 무슨 일 생기면 이렇게 바로바로 연락 주세요.\"",
+   "firstLine": "실수해도 괜찮으니까 무슨 일 생기면 이렇게 바로바로 연락 주세요.",
+   "reaction": "장문의 사과 메시지를 보내왔고, 이후 작은 문제도 즉시 공유했다.",
+   "outcome": "positive",
+   "outcomeDetail": "이후 다른 팀원이 같은 실수를 했을 때 그 팀원이 직접 해결을 도왔다.",
+   "lesson": "실수 직후의 첫 반응이 다음 보고 여부를 결정한다.",
+   "approachKey": "D",
+   "approach": "리더가 먼저 움직인다",
+   "approachDesc": "말보다 리더가 먼저 부담을 지고 움직인다."
+  },
+  {
+   "id": "R06",
+   "source": "real",
+   "type": "일정·의사결정",
+   "org": {
+    "industry": "IT/소프트웨어/통신",
+    "companySize": "50인 이상 ~ 300인 미만",
+    "teamSize": "5인 미만"
+   },
+   "situation": "클라이언트의 의사결정이 늦어지며 개발 일정이 계속 밀렸다. 인력과 커뮤니케이션 비용이 함께 늘고 있었다.",
+   "action": "모든 안건을 올리는 대신 기한에 직접 걸리는 안건만 추려 결정을 요청했다. 특정 안을 추천해 설득했다.",
+   "reason": "일정이 밀릴수록 비용이 커지고 재계약에도 영향이 있다고 봤다.",
+   "dialogue": "바쁘신 거 알지만, 결정아 필요한 아젠다를 먼저 공유드릴 테니 이렇게 진행해서 빠르게 작업 진도를 빼는 게 좋을 것 같습니다",
+   "firstLine": "바쁘신 거 알지만 결정이 필요한 안건만 먼저 공유드릴 테니, 이렇게 진행하면 좋을 것 같습니다.",
+   "reaction": "제안한 방향에 동의했다. 다만 의사결정이 늦어지는 문제 자체는 반복됐다.",
+   "outcome": "positive",
+   "outcomeDetail": "개발 진도가 정상화됐고 PM에 대한 신뢰가 쌓였다.",
+   "lesson": "전부 결정해달라고 하면 아무것도 오지 않는다. 잘라서 묻고 안을 제시한다.",
+   "approachKey": "E",
+   "approach": "묻는 방식을 바꾼다",
+   "approachDesc": "질문의 범위나 순서를 바꿔 답이 나오게 한다."
+  },
+  {
+   "id": "R07",
+   "source": "real",
+   "type": "소통·회의",
+   "org": {
+    "industry": "금융/보험/증권",
+    "companySize": "50인 이상 ~ 300인 미만",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "팀 안에서 업무 지시와 현황 공유가 제대로 이루어지지 않았다. 누가 무엇을 하고 있는지 서로 알기 어려웠다.",
+   "action": "1~2주 단위 스케줄을 공유하고 시간 배분안을 만들었다. 진행 상황을 눈에 보이게 정리했다.",
+   "reason": "규칙보다 눈에 보이는 일정표가 먼저 필요하다고 봤다.",
+   "dialogue": "업무 진행 상황이 어쩧게 되나요?",
+   "firstLine": "업무 진행 상황이 어떻게 되나요?",
+   "reaction": "상황 자체에 공감하지는 않았지만 필요한 자료는 제시했다.",
+   "outcome": "positive",
+   "outcomeDetail": "업무 효율이 올라갔고 진행 상황을 확인하는 데 드는 시간이 줄었다.",
+   "lesson": "공유가 안 되는 팀에는 규칙보다 가시화가 먼저다.",
+   "approachKey": "C",
+   "approach": "구조를 바꾼다",
+   "approachDesc": "대화로 풀지 않고 역할·절차·배분을 다시 짠다."
+  },
+  {
+   "id": "R08",
+   "source": "real",
+   "type": "업무 분장",
+   "org": {
+    "industry": "제조/생산/화학",
+    "companySize": "50인 이상 ~ 300인 미만",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "프로젝트 역할을 배분하며 특정 부분을 신경 써달라고 당부했다. 그 부분이 누락된 채 작업이 진행됐다.",
+   "action": "인원별로 역할을 명확히 지정하고 진행 상황을 파악했다. 주의사항은 구두로만 당부했다.",
+   "reason": "사전에 문제 소지를 짚어두면 알아서 챙길 것이라고 봤다.",
+   "dialogue": "xx님은 ~~ 해주시고 ~~하실때 oo신경써서 해주세요. 저는 xx를 하고있을테니 도움 필요하시면 말씀하세요.",
+   "firstLine": "xx님은 이 부분 해주시고, 하실 때 oo 신경 써서 해주세요.",
+   "reaction": "지시한 사항은 이행했지만 신경 써달라고 한 부분은 빠뜨렸다.",
+   "outcome": "negative",
+   "outcomeDetail": "팀 규모가 작아 결국 리더가 직접 다시 처리했다. 리더의 업무만 늘었다.",
+   "lesson": "‘신경 써서’는 지시가 아니다. 확인 방법까지 정해야 지시가 된다.",
+   "approachKey": "B",
+   "approach": "기준을 먼저 말한다",
+   "approachDesc": "사실·규칙·기대치를 먼저 제시하고 시작."
+  },
+  {
+   "id": "R09",
+   "source": "real",
+   "type": "업무 실수",
+   "org": {
+    "industry": "교육/연구/컨설팅",
+    "companySize": "1,000인 이상",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "팀원이 고객사에 금액을 잘못 안내해 약 100만원의 손해가 발생했다.",
+   "action": "책임 소재를 먼저 묻지 않고 상황이 발생한 경위를 확인했다. 어느 단계에서 오류가 생겼는지 함께 짚었다.",
+   "reason": "같은 상황이 반복되지 않게 하려면 원인 확인이 먼저라고 봤다.",
+   "dialogue": "어쩌다가 그런 실수를 했어?",
+   "firstLine": "어쩌다가 그런 실수를 했어?",
+   "reaction": "경위를 설명하고 실수가 생긴 원인을 스스로 복기했다.",
+   "outcome": "positive",
+   "outcomeDetail": "이후 팀장 선에서 문서를 한 번 더 검토하고 담당자 간 크로스체크를 하는 절차가 생겼다.",
+   "lesson": "경위 확인은 맞지만 ‘어쩌다가’는 이미 평가어다. 표현은 다듬을 여지가 있다.",
+   "approachKey": "A",
+   "approach": "사정을 먼저 듣는다",
+   "approachDesc": "원인과 맥락 확인이 먼저. 기준은 그 뒤에."
+  },
+  {
+   "id": "R10",
+   "source": "real",
+   "type": "과부하",
+   "org": {
+    "industry": "서비스/식음료/숙박",
+    "companySize": "1,000인 이상",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "행사 당일 예상보다 많은 참가자가 몰려 접수와 입장 업무가 동시에 지연될 상황이었다.",
+   "action": "현장 상황을 확인한 뒤 동료들의 업무를 재배치했다. 리더가 입장 안내를 맡고 접수 쪽 지원을 요청했다.",
+   "reason": "예정된 시간 안에 행사를 진행하는 것이 최우선이었다.",
+   "dialogue": "“지금 접수 쪽에 사람이 많이 몰리고 있어요. 제가 입장 안내를 맡을 테니 접수 쪽을 한 명 더 지원해주실 수 있을까요?”",
+   "firstLine": "지금 접수 쪽에 사람이 몰리고 있어요. 제가 입장 안내를 맡을 테니 접수를 한 명 더 지원해주실 수 있을까요?",
+   "reaction": "동료가 곧바로 접수 지원에 들어갔다.",
+   "outcome": "positive",
+   "outcomeDetail": "대기 줄이 빠르게 줄었고, 이후 동료들도 현장 상황에 따라 자발적으로 업무를 조율했다.",
+   "lesson": "리더가 한 자리를 맡고 부탁하면 지시보다 빠르게 움직인다.",
+   "approachKey": "D",
+   "approach": "리더가 먼저 움직인다",
+   "approachDesc": "말보다 리더가 먼저 부담을 지고 움직인다."
+  },
+  {
+   "id": "R11",
+   "source": "real",
+   "type": "평가·피드백",
+   "org": {
+    "industry": "교육/연구/컨설팅",
+    "companySize": "1,000인 이상",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "승진 평가 결과에 불만을 가진 구성원이 강하게 이의를 제기했다. 평가 자료는 공개할 수 없는 상황이었다.",
+   "action": "평가 과제를 직접 보여주기는 어렵다고 분명히 안내했다. 대신 피드백 리포트로 보완이 필요한 부분을 확인할 수 있게 했다.",
+   "reason": "공개가 어려운 상황에서도 납득할 만한 정보는 제공해야 한다고 봤다.",
+   "dialogue": "직접 시험 과제를 보여드리는 것은 어렵지만 피드백 리포트를 통해 어떤 부분에서 보완이 필요한지 확인하실 수 있도록 안내드리겠습니다.",
+   "firstLine": "직접 시험 과제를 보여드리긴 어렵지만, 피드백 리포트로 어떤 부분을 보완하면 좋을지 확인하실 수 있게 안내드리겠습니다.",
+   "reaction": "리포트를 확인할 수 있다는 설명을 듣고 감정을 추슬렀다.",
+   "outcome": "positive",
+   "outcomeDetail": "이후 감정적으로 이의를 제기하는 대신 피드백 내용을 바탕으로 부족한 부분을 확인했다. 리포트 항목도 더 세분화됐다.",
+   "lesson": "거절해야 할 때는 확인 가능한 대체 정보를 함께 준다.",
+   "approachKey": "F",
+   "approach": "선을 긋는다",
+   "approachDesc": "경고·거절로 명확한 경계를 만든다."
+  },
+  {
+   "id": "R12",
+   "source": "real",
+   "type": "팀원 간 갈등",
+   "org": {
+    "industry": "제조/생산/화학",
+    "companySize": "10인 이상 ~ 50인 미만",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "구성원들 사이에 입장 차이로 갈등이 생겨 중재가 필요했다.",
+   "action": "당사자를 각각 따로 면담해 상황과 입장을 먼저 확인했다. 이후 함께 대화할 자리를 만들어 원인과 해결 방법을 찾게 했다.",
+   "reason": "합동 자리부터 만들면 서로 방어하느라 사실 확인이 어려울 것이라고 봤다.",
+   "dialogue": "\"그 행동에는 어떤 의도가 있었나요?”, “당시에는 어떤 마음이었나요?”, “상대방의 행동은 어떻게 느껴졌나요?”, “다시 그 상황으로 돌아간다면 어떻게 행동하고 싶나요?”",
+   "firstLine": "그 행동에는 어떤 의도가 있었나요? 당시에는 어떤 마음이었나요?",
+   "reaction": "상대의 입장을 이해하고 자신의 행동을 돌아봤으며 사과하고 싶다는 뜻을 밝혔다.",
+   "outcome": "positive",
+   "outcomeDetail": "서로 사과하며 관계를 회복했고, 이후 비슷한 상황에서도 대화로 풀려는 모습을 보였다. 주변 구성원들에게도 같은 분위기가 퍼졌다.",
+   "lesson": "개별 면담이 먼저, 합동 자리가 나중이다. 순서를 바꾸면 싸움이 된다.",
+   "approachKey": "A",
+   "approach": "사정을 먼저 듣는다",
+   "approachDesc": "원인과 맥락 확인이 먼저. 기준은 그 뒤에."
+  },
+  {
+   "id": "R13",
+   "source": "real",
+   "type": "부서 간 조율",
+   "org": {
+    "industry": "공공/행정/비영리",
+    "companySize": "10인 이상 ~ 50인 미만",
+    "teamSize": "5인 미만"
+   },
+   "situation": "타 부서에서 예산과 공간상 수용하기 어려운 시설 신설을 요청해왔다. 이전 협의에서도 반대로 정리됐던 사안이었다.",
+   "action": "필요한 배경을 먼저 묻고 필요성에 충분히 공감을 표했다. 이후 예산·공간·유지관리라는 구체적 근거를 들어 어려운 이유를 설명했다.",
+   "reason": "들어줄 수 없는 요구일수록 무작정 반대하면 감정이 상한다고 봤다.",
+   "dialogue": "교내 샤워장 신설에 대한 명확한 목적이 무엇인가요?",
+   "firstLine": "교내 샤워장 신설에 대한 명확한 목적이 무엇인가요?",
+   "reaction": "처음에는 상급자와 이야기하겠다며 회피했으나 근거를 들은 뒤 납득했다.",
+   "outcome": "positive",
+   "outcomeDetail": "과거에는 단순 거절이라 반복 건의됐으나, 이번에는 합의에 도달해 재요청이 없었다.",
+   "lesson": "거절의 설득력은 근거의 구체성에서 나온다. 공감이 먼저다.",
+   "approachKey": "A",
+   "approach": "사정을 먼저 듣는다",
+   "approachDesc": "원인과 맥락 확인이 먼저. 기준은 그 뒤에."
+  },
+  {
+   "id": "S01",
+   "source": "synthetic",
+   "basedOn": [
+    "R03"
+   ],
+   "type": "근태",
+   "org": {
+    "industry": "제조/생산/화학",
+    "companySize": "50인 이상 ~ 300인 미만",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "팀원 한 명이 3주째 지각을 반복했다. 평균 20분씩 늦었고 메신저로 두 번 언급한 것 외에 공식 면담은 없었다.",
+   "action": "횟수를 먼저 꺼내지 않고 아침에 요즘 어떤지부터 물었다. 사정을 들은 뒤 출근 시간 조정을 함께 검토했다.",
+   "reason": "3주간 다루지 않다가 갑자기 횟수를 들이대면 태도를 바꾼 것으로 읽힐 것이라고 봤다.",
+   "dialogue": "요즘 아침에 무슨 일 있어요? 3주째라 한번 물어보려고 했어요.",
+   "firstLine": "요즘 아침에 무슨 일 있어요? 3주째라 한번 물어보려고 했어요.",
+   "reaction": "처음에는 변명하려다가 추궁이 아니라는 점을 느끼고 가족 간병 사정을 설명했다.",
+   "outcome": "positive",
+   "outcomeDetail": "출근 시간을 30분 조정하기로 합의했고 이후 지각이 없었다. 다른 팀원들도 사정이 있으면 미리 알리기 시작했다.",
+   "lesson": "횟수를 먼저 꺼내지 않은 것이 방어를 줄였다.",
+   "approachKey": "A",
+   "approach": "사정을 먼저 듣는다",
+   "approachDesc": "원인과 맥락 확인이 먼저. 기준은 그 뒤에."
+  },
+  {
+   "id": "S02",
+   "source": "synthetic",
+   "basedOn": [
+    "R08"
+   ],
+   "type": "근태",
+   "org": {
+    "industry": "유통/물류/운송/무역",
+    "companySize": "10인 이상 ~ 50인 미만",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "물류팀 팀원이 2주 사이 다섯 번 지각했다. 다른 팀원들의 불만이 들리기 시작했다.",
+   "action": "면담 자리에서 근태 기록을 출력해 보여주며 횟수부터 확인시켰다. 사정은 그 뒤에 물었다.",
+   "reason": "다른 팀원들이 보고 있어 기준을 명확히 하는 것이 먼저라고 봤다.",
+   "dialogue": "최근 2주 기록입니다. 5번 늦으셨는데 이 부분 정리하고 가야 할 것 같아요.",
+   "firstLine": "최근 2주 기록입니다. 5번 늦으셨는데 이 부분 정리하고 가야 할 것 같아요.",
+   "reaction": "표정이 굳으며 알겠다고만 답했고 사정은 끝내 말하지 않았다.",
+   "outcome": "negative",
+   "outcomeDetail": "지각은 즉시 사라졌지만 이후 업무 외 대화가 끊겼다. 두 달 뒤 부서 이동을 요청했다.",
+   "lesson": "기록을 먼저 꺼내면 행동은 바뀌지만 관계가 닫힌다.",
+   "approachKey": "B",
+   "approach": "기준을 먼저 말한다",
+   "approachDesc": "사실·규칙·기대치를 먼저 제시하고 시작."
+  },
+  {
+   "id": "S03",
+   "source": "synthetic",
+   "basedOn": [
+    "R03"
+   ],
+   "type": "근태",
+   "org": {
+    "industry": "서비스/식음료/숙박",
+    "companySize": "50인 이상 ~ 300인 미만",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "팀원이 두 달간 병가를 다섯 번 썼다. 진단서는 매번 제출했지만 특정 요일에 몰려 있었다.",
+   "action": "건강 상태를 먼저 확인하고 감당 가능한 업무량을 함께 조정했다. 근태 패턴 자체는 언급하지 않았다.",
+   "reason": "진단서가 있는 상황에서 패턴을 지적하면 의심으로 받아들여질 것이라고 봤다.",
+   "dialogue": "몸 상태가 계속 안 좋으신 것 같은데, 지금 맡은 업무량이 부담되는 건 아닌지 여쭤보고 싶었어요.",
+   "firstLine": "몸 상태가 계속 안 좋으신 것 같은데, 지금 맡은 업무량이 부담되는 건 아닌지 여쭤보고 싶었어요.",
+   "reaction": "업무량 조정은 받아들였지만 병가 사유에 대해서는 더 말하지 않았다.",
+   "outcome": "mixed",
+   "outcomeDetail": "병가 횟수는 절반으로 줄었으나 근본 원인은 확인하지 못했다. 세 달 뒤 같은 패턴이 재발했다.",
+   "lesson": "패턴을 못 본 척하면 당장은 부드럽지만 문제는 유예될 뿐이다.",
+   "approachKey": "C",
+   "approach": "구조를 바꾼다",
+   "approachDesc": "대화로 풀지 않고 역할·절차·배분을 다시 짠다."
+  },
+  {
+   "id": "S04",
+   "source": "synthetic",
+   "basedOn": [
+    "R07"
+   ],
+   "type": "근태",
+   "org": {
+    "industry": "IT/소프트웨어/통신",
+    "companySize": "50인 이상 ~ 300인 미만",
+    "teamSize": "5인 미만"
+   },
+   "situation": "재택근무 중인 팀원이 오전 시간대에 메신저 응답을 하지 않는 일이 반복됐다.",
+   "action": "개인을 지목하지 않고 팀 전체의 재택 응답 기준을 다시 합의하는 자리를 만들었다. 코어타임과 응답 기대 시간을 함께 정했다.",
+   "reason": "한 사람의 문제로 규정하면 감시받는 느낌이 들 것이라고 봤다.",
+   "dialogue": "재택할 때 언제까지 답하면 되는지 서로 기준이 좀 다른 것 같아서, 한번 같이 정하고 갔으면 해요.",
+   "firstLine": "재택할 때 언제까지 답하면 되는지 서로 기준이 좀 다른 것 같아서, 한번 같이 정하고 갔으면 해요.",
+   "reaction": "본인이 먼저 오전에 자리를 비우는 일이 있었다고 말하며 제안에 동의했다.",
+   "outcome": "positive",
+   "outcomeDetail": "응답 지연이 사라졌고 다른 팀원들도 재택 시 일정을 자발적으로 공유하기 시작했다.",
+   "lesson": "개인의 문제로 보이는 것이 실은 기준의 부재일 때가 있다.",
+   "approachKey": "B",
+   "approach": "기준을 먼저 말한다",
+   "approachDesc": "사실·규칙·기대치를 먼저 제시하고 시작."
+  },
+  {
+   "id": "S05",
+   "source": "synthetic",
+   "basedOn": [
+    "R08"
+   ],
+   "type": "근태",
+   "org": {
+    "industry": "서비스/식음료/숙박",
+    "companySize": "10인 미만",
+    "teamSize": "5인 미만"
+   },
+   "situation": "아르바이트 팀원이 마감 전 조퇴를 자주 요청했다. 남은 직원들이 그 부담을 나눠 지고 있었다.",
+   "action": "마감 회의 중 다른 직원들이 있는 자리에서 조퇴 빈도를 언급했다.",
+   "reason": "다른 직원들도 아는 사안이라 함께 이야기하는 것이 공정하다고 봤다.",
+   "dialogue": "요즘 조퇴가 잦은데, 남는 사람들이 힘들어하는 거 알고 계시죠?",
+   "firstLine": "요즘 조퇴가 잦은데, 남는 사람들이 힘들어하는 거 알고 계시죠?",
+   "reaction": "그 자리에서는 사과했지만 표정이 굳었고 이후 다른 직원들과도 거리를 뒀다.",
+   "outcome": "negative",
+   "outcomeDetail": "2주 뒤 그만두겠다고 통보했다. 남은 직원들 사이에서도 리더에 대한 신뢰가 떨어졌다.",
+   "lesson": "개인 근태는 공개 석상에서 다루지 않는다. 공정해 보이려다 모두를 잃는다.",
+   "approachKey": "B",
+   "approach": "기준을 먼저 말한다",
+   "approachDesc": "사실·규칙·기대치를 먼저 제시하고 시작."
+  },
+  {
+   "id": "S06",
+   "source": "synthetic",
+   "basedOn": [
+    "R10"
+   ],
+   "type": "근태",
+   "org": {
+    "industry": "공공/행정/비영리",
+    "companySize": "10인 이상 ~ 50인 미만",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "육아 중인 팀원의 출근 시간이 일정하지 않아 오전 업무 배분에 혼선이 생겼다.",
+   "action": "근태를 문제로 규정하지 않고 오전에 확정적으로 가능한 시간대를 확인했다. 그에 맞춰 업무 배분표를 다시 짰다.",
+   "reason": "출근 시간을 바꾸기 어려운 상황이라 시간 대신 업무를 바꾸는 것이 맞다고 봤다.",
+   "dialogue": "오전에 확실히 가능한 시간이 언제인지 알려주시면, 그 시간에 맞춰서 일을 다시 나눠보려고요.",
+   "firstLine": "오전에 확실히 가능한 시간이 언제인지 알려주시면, 그 시간에 맞춰서 일을 다시 나눠보려고요.",
+   "reaction": "안도하는 반응을 보이며 가능한 시간대를 구체적으로 알려줬다.",
+   "outcome": "positive",
+   "outcomeDetail": "오전 혼선이 사라졌고, 가능한 시간에 업무 밀도를 높여 처리량이 오히려 늘었다.",
+   "lesson": "바꿀 수 없는 조건은 그대로 두고 그 주변을 설계한다.",
+   "approachKey": "C",
+   "approach": "구조를 바꾼다",
+   "approachDesc": "대화로 풀지 않고 역할·절차·배분을 다시 짠다."
+  },
+  {
+   "id": "S07",
+   "source": "synthetic",
+   "basedOn": [
+    "R09",
+    "R05"
+   ],
+   "type": "업무 실수",
+   "org": {
+    "industry": "금융/보험/증권",
+    "companySize": "1,000인 이상",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "팀원이 고객사 견적 금액을 잘못 안내해 약 300만원의 손실이 발생했다.",
+   "action": "책임 소재를 먼저 묻지 않고 경위를 시간순으로 함께 복기했다. 확인이 빠진 단계를 찾은 뒤 검토 절차를 추가했다.",
+   "reason": "같은 실수를 막는 것이 목적이지 누구 잘못인지 가리는 것이 목적은 아니라고 봤다.",
+   "dialogue": "지금 상황부터 정리해보죠. 어느 단계에서 숫자가 바뀌었는지 같이 짚어봅시다.",
+   "firstLine": "지금 상황부터 정리해보죠. 어느 단계에서 숫자가 바뀌었는지 같이 짚어봅시다.",
+   "reaction": "긴장했지만 방어하지 않고 자기 확인 절차가 빠진 지점을 스스로 짚었다.",
+   "outcome": "positive",
+   "outcomeDetail": "담당자 간 크로스체크 절차가 생겼고 이후 유사한 오류가 사라졌다.",
+   "lesson": "‘왜 그랬냐’ 대신 ‘어디서 갈렸냐’를 물으면 방어가 사라진다.",
+   "approachKey": "A",
+   "approach": "사정을 먼저 듣는다",
+   "approachDesc": "원인과 맥락 확인이 먼저. 기준은 그 뒤에."
+  },
+  {
+   "id": "S08",
+   "source": "synthetic",
+   "basedOn": [
+    "R09"
+   ],
+   "type": "업무 실수",
+   "org": {
+    "industry": "교육/연구/컨설팅",
+    "companySize": "50인 이상 ~ 300인 미만",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "제출 문서에 오탈자와 수치 오류가 반복되는 팀원이 있었다. 세 번째 반복이었다.",
+   "action": "개인 역량 문제로 보지 않고 제출 전 체크리스트를 만들었다. 함께 채우게 하며 확인 절차를 만들었다.",
+   "reason": "지적은 이미 두 번 했고 효과가 없어 방식 자체를 바꿔야 한다고 봤다.",
+   "dialogue": "지적하는 건 이미 두 번 했으니까 이번엔 방식을 바꿔볼게요. 제출 전에 같이 볼 목록을 만들어보죠.",
+   "firstLine": "지적하는 건 이미 두 번 했으니까 이번엔 방식을 바꿔볼게요. 제출 전에 같이 볼 목록을 만들어보죠.",
+   "reaction": "체크리스트 도입에는 동의했지만 매번 채우지는 않았다.",
+   "outcome": "mixed",
+   "outcomeDetail": "오류는 절반으로 줄었으나 완전히 사라지지 않았다. 결국 팀장이 최종 검토를 계속 맡게 됐다.",
+   "lesson": "도구를 주는 것과 습관이 생기는 것은 다르다. 확인 시점을 함께 정해야 한다.",
+   "approachKey": "C",
+   "approach": "구조를 바꾼다",
+   "approachDesc": "대화로 풀지 않고 역할·절차·배분을 다시 짠다."
+  },
+  {
+   "id": "S09",
+   "source": "synthetic",
+   "basedOn": [
+    "R05"
+   ],
+   "type": "업무 실수",
+   "org": {
+    "industry": "서비스/식음료/숙박",
+    "companySize": "10인 이상 ~ 50인 미만",
+    "teamSize": "5인 미만"
+   },
+   "situation": "팀원이 예약 시스템을 잘못 조작해 고객 이중 예약이 발생했다. 본인이 당황해 바로 연락해왔다.",
+   "action": "질책 없이 전화로 상황을 듣고 처리 방법을 단계별로 알려줬다. 이후 해결됐는지 다시 확인했다.",
+   "reason": "당황한 상태에서 잘못부터 지적하면 다음부터 숨길 것이라고 봤다.",
+   "dialogue": "실수해도 괜찮으니까 무슨 일 생기면 이렇게 바로 연락 주세요.",
+   "firstLine": "실수해도 괜찮으니까 무슨 일 생기면 이렇게 바로 연락 주세요.",
+   "reaction": "장문의 사과 메시지를 보내왔고 이후 작은 문제도 즉시 공유했다.",
+   "outcome": "positive",
+   "outcomeDetail": "이후 다른 팀원이 같은 실수를 했을 때 그 팀원이 직접 해결을 도왔다.",
+   "lesson": "실수 직후의 반응이 다음 보고 여부를 결정한다.",
+   "approachKey": "D",
+   "approach": "리더가 먼저 움직인다",
+   "approachDesc": "말보다 리더가 먼저 부담을 지고 움직인다."
+  },
+  {
+   "id": "S10",
+   "source": "synthetic",
+   "basedOn": [
+    "R08"
+   ],
+   "type": "업무 실수",
+   "org": {
+    "industry": "제조/생산/화학",
+    "companySize": "300인 이상 ~ 1,000인 미만",
+    "teamSize": "10인 이상 ~ 20인 미만"
+   },
+   "situation": "품질 이슈를 발견한 팀원이 보고하지 않고 자체 수정하려다 문제가 커진 뒤에야 알려졌다.",
+   "action": "은폐 시도 자체를 강하게 지적하고 재발 시 인사 조치를 언급했다.",
+   "reason": "안전과 직결된 사안이라 명확한 경고가 필요하다고 봤다.",
+   "dialogue": "이건 넘어갈 수 없는 문제입니다. 왜 바로 보고하지 않았는지 설명해주세요.",
+   "firstLine": "이건 넘어갈 수 없는 문제입니다. 왜 바로 보고하지 않았는지 설명해주세요.",
+   "reaction": "즉시 사과했지만 이유는 말하지 않았다. 이후 보고는 늘었으나 형식적이었다.",
+   "outcome": "negative",
+   "outcomeDetail": "보고 건수는 늘었지만 판단이 필요한 사안까지 전부 올라와 팀장의 업무가 늘었다. 팀원은 스스로 판단하기를 멈췄다.",
+   "lesson": "경고는 행동을 바꾸지만 판단력을 함께 없앤다.",
+   "approachKey": "F",
+   "approach": "선을 긋는다",
+   "approachDesc": "경고·거절로 명확한 경계를 만든다."
+  },
+  {
+   "id": "S11",
+   "source": "synthetic",
+   "basedOn": [
+    "R08"
+   ],
+   "type": "업무 실수",
+   "org": {
+    "industry": "IT/소프트웨어/통신",
+    "companySize": "50인 이상 ~ 300인 미만",
+    "teamSize": "5인 미만"
+   },
+   "situation": "배포 일정에서 특정 기능의 검수가 누락된 채 릴리스됐다. 담당이 명확하지 않은 항목이었다.",
+   "action": "개인 책임을 묻는 대신 릴리스 체크포인트에서 누가 무엇을 확인하는지 문서로 확정했다.",
+   "reason": "담당이 모호한 상태에서 개인을 지목하면 억울함만 남는다고 봤다.",
+   "dialogue": "이번 건은 누구 잘못인지보다, 확인 담당이 비어 있었던 게 문제로 보여요.",
+   "firstLine": "이번 건은 누구 잘못인지보다, 확인 담당이 비어 있었던 게 문제로 보여요.",
+   "reaction": "안도하면서도 자신이 챙겼어야 했다며 자책했다.",
+   "outcome": "mixed",
+   "outcomeDetail": "문서화 이후 누락은 줄었지만 문서에 없는 새로운 항목에서 같은 일이 반복됐다.",
+   "lesson": "구조를 고치면 재발은 줄지만 새 유형까지 막지는 못한다.",
+   "approachKey": "C",
+   "approach": "구조를 바꾼다",
+   "approachDesc": "대화로 풀지 않고 역할·절차·배분을 다시 짠다."
+  },
+  {
+   "id": "S12",
+   "source": "synthetic",
+   "basedOn": [
+    "R05"
+   ],
+   "type": "업무 실수",
+   "org": {
+    "industry": "IT/소프트웨어/통신",
+    "companySize": "10인 이상 ~ 50인 미만",
+    "teamSize": "5인 미만"
+   },
+   "situation": "코드 리뷰에서 같은 지적이 반복되는 주니어 팀원이 있었다. 리뷰 코멘트는 매번 수용했다.",
+   "action": "지적을 글로 남기는 대신 30분씩 함께 작업했다. 왜 그렇게 고치는지 직접 설명했다.",
+   "reason": "코멘트를 이해하지 못한 채 그대로 반영만 하고 있다고 봤다.",
+   "dialogue": "코멘트로만 주고받으니 잘 안 붙는 것 같아서요. 30분만 같이 볼까요?",
+   "firstLine": "코멘트로만 주고받으니 잘 안 붙는 것 같아서요. 30분만 같이 볼까요?",
+   "reaction": "처음에는 부담스러워했지만 두 번째부터 먼저 질문하기 시작했다.",
+   "outcome": "positive",
+   "outcomeDetail": "같은 유형의 지적이 사라졌고, 이후 다른 주니어의 리뷰를 돕는 역할을 맡았다.",
+   "lesson": "반복 지적이 안 먹히면 전달 방식이 문제일 수 있다.",
+   "approachKey": "D",
+   "approach": "리더가 먼저 움직인다",
+   "approachDesc": "말보다 리더가 먼저 부담을 지고 움직인다."
+  },
+  {
+   "id": "S13",
+   "source": "synthetic",
+   "basedOn": [
+    "R12"
+   ],
+   "type": "팀원 간 갈등",
+   "org": {
+    "industry": "제조/생산/화학",
+    "companySize": "10인 이상 ~ 50인 미만",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "두 팀원이 공통 업무를 서로 미루며 마찰이 생겼다. 회의에서 냉랭한 분위기가 이어졌다.",
+   "action": "각각 따로 면담해 입장을 먼저 들었다. 사흘 뒤 함께 대화하는 자리를 만들어 의도와 감정을 묻는 질문으로 시작했다.",
+   "reason": "합동 면담부터 하면 서로 방어하느라 사실 확인이 안 될 것이라고 봤다.",
+   "dialogue": "그 행동에는 어떤 의도가 있었나요? 당시에는 어떤 마음이었나요?",
+   "firstLine": "그 행동에는 어떤 의도가 있었나요? 당시에는 어떤 마음이었나요?",
+   "reaction": "각자 상대의 입장을 이해했고 한 사람이 먼저 사과 의사를 밝혔다.",
+   "outcome": "positive",
+   "outcomeDetail": "두 사람이 서로 사과하며 관계를 회복했다. 이후 주변 구성원들도 갈등을 대화로 풀려는 분위기가 생겼다.",
+   "lesson": "개별 면담이 먼저, 합동 자리가 나중이다. 순서를 바꾸면 싸움이 된다.",
+   "approachKey": "A",
+   "approach": "사정을 먼저 듣는다",
+   "approachDesc": "원인과 맥락 확인이 먼저. 기준은 그 뒤에."
+  },
+  {
+   "id": "S14",
+   "source": "synthetic",
+   "basedOn": [
+    "R12"
+   ],
+   "type": "팀원 간 갈등",
+   "org": {
+    "industry": "유통/물류/운송/무역",
+    "companySize": "50인 이상 ~ 300인 미만",
+    "teamSize": "10인 이상 ~ 20인 미만"
+   },
+   "situation": "특정 팀원에 대한 험담이 돈다는 이야기를 전해 들었다. 당사자는 아직 모르는 상태였다.",
+   "action": "출처를 확인하지 않고 팀 전체 회의에서 험담 금지를 공지했다.",
+   "reason": "특정인을 지목하면 상황이 커질 것 같아 전체 대상으로 말하는 것이 안전하다고 봤다.",
+   "dialogue": "요즘 팀 내에서 뒷말이 오간다는 이야기가 있는데, 그런 건 하지 맙시다.",
+   "firstLine": "요즘 팀 내에서 뒷말이 오간다는 이야기가 있는데, 그런 건 하지 맙시다.",
+   "reaction": "모두가 침묵했고 이후 누가 말했는지 서로 의심하는 분위기가 생겼다.",
+   "outcome": "negative",
+   "outcomeDetail": "험담은 지하로 숨었고 팀 내 대화량 자체가 줄었다. 당사자는 뒤늦게 소문을 알고 더 상처받았다.",
+   "lesson": "출처를 모른 채 전체 공지하면 문제는 사라지지 않고 숨는다.",
+   "approachKey": "B",
+   "approach": "기준을 먼저 말한다",
+   "approachDesc": "사실·규칙·기대치를 먼저 제시하고 시작."
+  },
+  {
+   "id": "S15",
+   "source": "synthetic",
+   "basedOn": [
+    "R02",
+    "R13"
+   ],
+   "type": "팀원 간 갈등",
+   "org": {
+    "industry": "교육/연구/컨설팅",
+    "companySize": "1,000인 이상",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "경력 입사자와 기존 팀원 사이에 업무 방식 차이로 마찰이 반복됐다.",
+   "action": "누가 옳은지 판단하지 않고 두 방식이 각각 어디에 유리한지 정리했다. 업무별 적용 범위를 문서화했다.",
+   "reason": "방식의 우열을 가리면 진 쪽이 팀을 떠날 것이라고 봤다.",
+   "dialogue": "두 방식이 다 이유가 있어 보여서요. 어떤 일에 어떤 방식이 맞는지부터 나눠볼까요?",
+   "firstLine": "두 방식이 다 이유가 있어 보여서요. 어떤 일에 어떤 방식이 맞는지부터 나눠볼까요?",
+   "reaction": "처음에는 둘 다 불만이었지만 자기 방식이 인정받는 영역이 생기자 수용했다.",
+   "outcome": "positive",
+   "outcomeDetail": "마찰이 사라졌고 두 방식을 섞은 절차가 팀 표준이 됐다.",
+   "lesson": "옳고 그름을 가리는 대신 적용 범위를 나누면 둘 다 남는다.",
+   "approachKey": "C",
+   "approach": "구조를 바꾼다",
+   "approachDesc": "대화로 풀지 않고 역할·절차·배분을 다시 짠다."
+  },
+  {
+   "id": "S16",
+   "source": "synthetic",
+   "basedOn": [
+    "R12"
+   ],
+   "type": "팀원 간 갈등",
+   "org": {
+    "industry": "서비스/식음료/숙박",
+    "companySize": "50인 이상 ~ 300인 미만",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "20대 팀원과 50대 팀원 사이에 업무 지시 방식을 두고 감정 충돌이 있었다.",
+   "action": "양쪽을 한자리에 불러 서로 오해를 풀도록 유도했다.",
+   "reason": "빨리 봉합하는 것이 팀 분위기에 낫다고 봤다.",
+   "dialogue": "두 분 다 오해가 있었던 것 같으니 여기서 풀고 갑시다.",
+   "firstLine": "두 분 다 오해가 있었던 것 같으니 여기서 풀고 갑시다.",
+   "reaction": "그 자리에서는 악수했지만 이후 서로 필요한 말만 주고받았다.",
+   "outcome": "negative",
+   "outcomeDetail": "표면적으로는 정리됐으나 협업이 필요한 업무에서 서로를 피했다. 결국 업무를 분리해 대응해야 했다.",
+   "lesson": "입장을 따로 듣지 않은 합동 면담은 봉합이지 해결이 아니다.",
+   "approachKey": "B",
+   "approach": "기준을 먼저 말한다",
+   "approachDesc": "사실·규칙·기대치를 먼저 제시하고 시작."
+  },
+  {
+   "id": "S17",
+   "source": "synthetic",
+   "basedOn": [
+    "R13"
+   ],
+   "type": "부서 간 조율",
+   "org": {
+    "industry": "공공/행정/비영리",
+    "companySize": "10인 이상 ~ 50인 미만",
+    "teamSize": "5인 미만"
+   },
+   "situation": "타 부서에서 예산과 공간상 수용하기 어려운 시설 신설을 반복 요청해왔다.",
+   "action": "필요성에 대해 충분히 공감을 표한 뒤 예산·공간·유지관리라는 구체적 근거를 들어 어려운 이유를 설명했다.",
+   "reason": "들어줄 수 없는 요구일수록 무작정 반대하면 감정이 상한다고 봤다.",
+   "dialogue": "신설이 필요하다고 보시는 이유가 무엇인지 먼저 여쭤봐도 될까요?",
+   "firstLine": "신설이 필요하다고 보시는 이유가 무엇인지 먼저 여쭤봐도 될까요?",
+   "reaction": "처음에는 상급자와 이야기하겠다며 회피했으나 근거를 들은 뒤 납득했다.",
+   "outcome": "positive",
+   "outcomeDetail": "이전에는 단순 거절이라 반복 건의됐으나 이번에는 합의에 도달해 재요청이 없었다.",
+   "lesson": "거절의 설득력은 근거의 구체성에서 나온다. 공감이 먼저다.",
+   "approachKey": "A",
+   "approach": "사정을 먼저 듣는다",
+   "approachDesc": "원인과 맥락 확인이 먼저. 기준은 그 뒤에."
+  },
+  {
+   "id": "S18",
+   "source": "synthetic",
+   "basedOn": [
+    "R12"
+   ],
+   "type": "팀원 간 갈등",
+   "org": {
+    "industry": "금융/보험/증권",
+    "companySize": "50인 이상 ~ 300인 미만",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "회의 중 감정이 격해진 팀원이 자리를 뜬 뒤 며칠간 냉전 상태가 이어졌다.",
+   "action": "바로 부르지 않고 이틀을 두었다가 개별적으로 만났다. 그날 무엇이 힘들었는지 물었다.",
+   "reason": "감정이 남아 있는 상태에서 부르면 같은 장면이 반복될 것이라고 봤다.",
+   "dialogue": "그날 회의 이후로 계속 마음에 걸렸어요. 어떤 부분이 제일 힘드셨어요?",
+   "firstLine": "그날 회의 이후로 계속 마음에 걸렸어요. 어떤 부분이 제일 힘드셨어요?",
+   "reaction": "사과하면서도 반복적으로 발언이 잘렸던 경험을 털어놨다.",
+   "outcome": "mixed",
+   "outcomeDetail": "본인과의 관계는 회복됐고 회의 발언 규칙이 생겼다. 다만 갈등 상대와의 관계는 그대로였다.",
+   "lesson": "시간을 두는 것은 유효하지만 한쪽만 만나면 절반만 풀린다.",
+   "approachKey": "A",
+   "approach": "사정을 먼저 듣는다",
+   "approachDesc": "원인과 맥락 확인이 먼저. 기준은 그 뒤에."
+  },
+  {
+   "id": "S19",
+   "source": "synthetic",
+   "basedOn": [
+    "R01"
+   ],
+   "type": "소통·회의",
+   "org": {
+    "industry": "교육/연구/컨설팅",
+    "companySize": "50인 이상 ~ 300인 미만",
+    "teamSize": "10인 이상 ~ 20인 미만"
+   },
+   "situation": "회의에서 의견을 물으면 아무도 답하지 않고 침묵이 이어지는 상황이 반복됐다.",
+   "action": "개방형 질문을 접고 두 개의 선택지를 제시했다. 예·아니오로 답할 수 있게 묻는 방식도 함께 썼다.",
+   "reason": "지나치게 넓은 질문에는 선뜻 대답하기 어려워한다고 봤다.",
+   "dialogue": "이 방식으로 가는 게 좋을까요, 아니면 기존대로 가는 게 나을까요?",
+   "firstLine": "이 방식으로 가는 게 좋을까요, 아니면 기존대로 가는 게 나을까요?",
+   "reaction": "둘 중 하나를 선택해 답하기 시작했고 이후 이유까지 덧붙였다.",
+   "outcome": "positive",
+   "outcomeDetail": "선택형 질문이 익숙해지자 스스로 다른 의견을 내거나 반대 입장에서 생각해보기도 했다.",
+   "lesson": "침묵은 의견이 없어서가 아니라 답의 범위가 넓어서일 때가 많다.",
+   "approachKey": "E",
+   "approach": "묻는 방식을 바꾼다",
+   "approachDesc": "질문의 범위나 순서를 바꿔 답이 나오게 한다."
+  },
+  {
+   "id": "S20",
+   "source": "synthetic",
+   "basedOn": [
+    "R06"
+   ],
+   "type": "소통·회의",
+   "org": {
+    "industry": "제조/생산/화학",
+    "companySize": "50인 이상 ~ 300인 미만",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "업무 지시를 할 때마다 왜 해야 하는지 되묻는 팀원이 있어 진행이 지연됐다.",
+   "action": "지시 전에 배경과 이 일이 어디에 쓰이는지를 먼저 설명하는 방식으로 순서를 바꿨다.",
+   "reason": "되묻는 것이 반항이 아니라 맥락 부족일 수 있다고 봤다.",
+   "dialogue": "이 작업이 어디에 쓰이는지부터 말씀드릴게요. 그다음에 방식 정하시죠.",
+   "firstLine": "이 작업이 어디에 쓰이는지부터 말씀드릴게요. 그다음에 방식 정하시죠.",
+   "reaction": "질문 횟수가 줄었고 대신 개선 제안을 하기 시작했다.",
+   "outcome": "positive",
+   "outcomeDetail": "지시 후 재확인하는 소통이 사라져 진행 속도가 빨라졌다.",
+   "lesson": "‘왜요’는 저항이 아니라 맥락 요청일 수 있다.",
+   "approachKey": "E",
+   "approach": "묻는 방식을 바꾼다",
+   "approachDesc": "질문의 범위나 순서를 바꿔 답이 나오게 한다."
+  },
+  {
+   "id": "S21",
+   "source": "synthetic",
+   "basedOn": [
+    "R07"
+   ],
+   "type": "소통·회의",
+   "org": {
+    "industry": "IT/소프트웨어/통신",
+    "companySize": "10인 이상 ~ 50인 미만",
+    "teamSize": "5인 미만"
+   },
+   "situation": "메신저 질문에 반나절씩 답이 없는 팀원이 있어 협업이 막혔다.",
+   "action": "개인에게 말하는 대신 팀 단위로 응답 기대 시간을 정하는 자리를 만들었다.",
+   "reason": "개인 지적으로 시작하면 감시로 느낄 것이라고 봤다.",
+   "dialogue": "급한 것과 안 급한 걸 구분하는 기준이 없어서 서로 힘든 것 같아요. 한번 정해볼까요?",
+   "firstLine": "급한 것과 안 급한 걸 구분하는 기준이 없어서 서로 힘든 것 같아요. 한번 정해볼까요?",
+   "reaction": "규칙 자체에는 동의했지만 실제 응답 속도는 크게 변하지 않았다.",
+   "outcome": "mixed",
+   "outcomeDetail": "긴급 표시가 붙은 건은 빨라졌으나 일반 문의는 그대로였다. 결국 급한 건만 전화로 처리하게 됐다.",
+   "lesson": "규칙에 합의하는 것과 규칙을 지키는 것은 다르다.",
+   "approachKey": "B",
+   "approach": "기준을 먼저 말한다",
+   "approachDesc": "사실·규칙·기대치를 먼저 제시하고 시작."
+  },
+  {
+   "id": "S22",
+   "source": "synthetic",
+   "basedOn": [
+    "R09"
+   ],
+   "type": "태도",
+   "org": {
+    "industry": "서비스/식음료/숙박",
+    "companySize": "1,000인 이상",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "고객 응대 시 말투가 사무적이라는 컴플레인이 두 차례 들어왔다.",
+   "action": "말투 자체를 지적하는 대신 컴플레인이 있었던 구체적 장면을 함께 봤다. 어떤 표현이 어떻게 들렸는지 짚었다.",
+   "reason": "말투가 문제라고 하면 인격 지적으로 들릴 것이라고 봤다.",
+   "dialogue": "이 장면만 같이 볼까요? 이 문장이 고객에게 어떻게 들렸을지 궁금해서요.",
+   "firstLine": "이 장면만 같이 볼까요? 이 문장이 고객에게 어떻게 들렸을지 궁금해서요.",
+   "reaction": "처음에는 억울해했지만 구체적 문장을 보고는 수긍했다.",
+   "outcome": "mixed",
+   "outcomeDetail": "해당 표현은 고쳤으나 응대 전반의 톤은 그대로였다. 컴플레인은 줄었지만 사라지지 않았다.",
+   "lesson": "구체적 장면으로 말하면 수용되지만 장면 하나를 고친다고 태도가 바뀌지는 않는다.",
+   "approachKey": "E",
+   "approach": "묻는 방식을 바꾼다",
+   "approachDesc": "질문의 범위나 순서를 바꿔 답이 나오게 한다."
+  },
+  {
+   "id": "S23",
+   "source": "synthetic",
+   "basedOn": [
+    "R08"
+   ],
+   "type": "태도",
+   "org": {
+    "industry": "금융/보험/증권",
+    "companySize": "300인 이상 ~ 1,000인 미만",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "상급자 앞에서와 팀 내부에서의 태도가 크게 다른 팀원이 있어 다른 팀원들의 불만이 나왔다.",
+   "action": "면담에서 그 차이를 직접 지적했다.",
+   "reason": "다른 팀원들이 이미 알고 있어 방치하면 리더의 신뢰가 떨어진다고 봤다.",
+   "dialogue": "위에서랑 팀 안에서 태도가 좀 다르신 것 같은데, 본인은 어떻게 생각하세요?",
+   "firstLine": "위에서랑 팀 안에서 태도가 좀 다르신 것 같은데, 본인은 어떻게 생각하세요?",
+   "reaction": "강하게 부인했고 이후 면담 자체를 회피했다.",
+   "outcome": "negative",
+   "outcomeDetail": "관계가 냉각됐고 문제 행동은 유지됐다. 다른 팀원들에게는 개입해도 소용없다는 인상만 남았다.",
+   "lesson": "관찰이 아닌 인물 평가로 시작하면 방어밖에 남지 않는다.",
+   "approachKey": "F",
+   "approach": "선을 긋는다",
+   "approachDesc": "경고·거절로 명확한 경계를 만든다."
+  },
+  {
+   "id": "S24",
+   "source": "synthetic",
+   "basedOn": [
+    "R03"
+   ],
+   "type": "성과 저하",
+   "org": {
+    "industry": "교육/연구/컨설팅",
+    "companySize": "50인 이상 ~ 300인 미만",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "평소 성과가 좋던 팀원의 산출물 질이 두 달 사이 눈에 띄게 떨어졌다.",
+   "action": "성과를 언급하기 전에 최근 컨디션과 개인 상황부터 물었다.",
+   "reason": "갑작스러운 변화는 역량이 아니라 상황 문제일 가능성이 높다고 봤다.",
+   "dialogue": "요즘 좀 달라 보이셔서요. 회사 일 말고도 힘든 게 있으신가 해서 여쭤봐요.",
+   "firstLine": "요즘 좀 달라 보이셔서요. 회사 일 말고도 힘든 게 있으신가 해서 여쭤봐요.",
+   "reaction": "가족 문제로 소진 상태였다고 털어놓았다.",
+   "outcome": "positive",
+   "outcomeDetail": "일시적으로 업무를 재배분했고 두 달 뒤 이전 수준을 회복했다. 이후 어려운 일이 있을 때 먼저 알려왔다.",
+   "lesson": "갑작스러운 성과 하락은 능력이 아니라 상황을 먼저 본다.",
+   "approachKey": "A",
+   "approach": "사정을 먼저 듣는다",
+   "approachDesc": "원인과 맥락 확인이 먼저. 기준은 그 뒤에."
+  },
+  {
+   "id": "S25",
+   "source": "synthetic",
+   "basedOn": [
+    "R02"
+   ],
+   "type": "성과 저하",
+   "org": {
+    "industry": "유통/물류/운송/무역",
+    "companySize": "10인 이상 ~ 50인 미만",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "입사 3년차 팀원이 최소한의 업무만 하고 추가 제안을 전혀 하지 않게 됐다.",
+   "action": "동기부여를 말하는 대신 맡은 업무 중 어떤 것이 의미 있게 느껴지는지 물었다. 그에 맞춰 업무를 재배치했다.",
+   "reason": "의욕을 문제 삼으면 더 닫힐 것이라고 봤다.",
+   "dialogue": "지금 하시는 일 중에 그나마 할 만한 게 뭔지 알고 싶어요.",
+   "firstLine": "지금 하시는 일 중에 그나마 할 만한 게 뭔지 알고 싶어요.",
+   "reaction": "구체적으로 답하지는 못했지만 반복 업무가 힘들다고 말했다.",
+   "outcome": "mixed",
+   "outcomeDetail": "업무를 바꾼 뒤 세 달간은 나아졌으나 이후 다시 같은 상태로 돌아갔다.",
+   "lesson": "업무 배치는 증상을 늦출 뿐, 이유를 못 찾으면 되돌아온다.",
+   "approachKey": "C",
+   "approach": "구조를 바꾼다",
+   "approachDesc": "대화로 풀지 않고 역할·절차·배분을 다시 짠다."
+  },
+  {
+   "id": "S26",
+   "source": "synthetic",
+   "basedOn": [
+    "R11"
+   ],
+   "type": "평가·피드백",
+   "org": {
+    "industry": "교육/연구/컨설팅",
+    "companySize": "1,000인 이상",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "승진 평가에서 탈락한 팀원이 결과에 강하게 이의를 제기했다.",
+   "action": "평가 자료 원본은 공개할 수 없다고 분명히 안내했다. 대신 피드백 리포트를 통해 보완 지점을 확인할 수 있게 했다.",
+   "reason": "공개 불가라는 사실만 전하면 납득이 어려울 것이라고 봤다.",
+   "dialogue": "시험 과제를 직접 보여드리긴 어렵지만, 피드백 리포트로 어떤 부분을 보완하면 좋을지는 확인하실 수 있게 안내드릴게요.",
+   "firstLine": "시험 과제를 직접 보여드리긴 어렵지만, 피드백 리포트로 어떤 부분을 보완하면 좋을지는 확인하실 수 있게 안내드릴게요.",
+   "reaction": "리포트를 확인할 수 있다는 설명을 듣고 감정을 추슬렀다.",
+   "outcome": "positive",
+   "outcomeDetail": "감정적 이의 제기 대신 피드백 내용을 기반으로 부족한 부분을 확인했다. 이후 리포트 항목도 세분화됐다.",
+   "lesson": "거절해야 할 때는 대체 정보를 함께 준다.",
+   "approachKey": "F",
+   "approach": "선을 긋는다",
+   "approachDesc": "경고·거절로 명확한 경계를 만든다."
+  },
+  {
+   "id": "S27",
+   "source": "synthetic",
+   "basedOn": [
+    "R07"
+   ],
+   "type": "성과 저하",
+   "org": {
+    "industry": "제조/생산/화학",
+    "companySize": "300인 이상 ~ 1,000인 미만",
+    "teamSize": "10인 이상 ~ 20인 미만"
+   },
+   "situation": "분기 목표를 세 번 연속 미달한 팀원이 있었다. 본인도 위축된 상태였다.",
+   "action": "목표를 낮추지 않고 분기 목표를 주 단위로 쪼갰다. 매주 확인하는 시점을 만들었다.",
+   "reason": "긴 목표만 있으면 실패를 분기 말에야 확인하게 된다고 봤다.",
+   "dialogue": "목표를 줄이자는 건 아니고요, 확인하는 간격을 줄여보려고요.",
+   "firstLine": "목표를 줄이자는 건 아니고요, 확인하는 간격을 줄여보려고요.",
+   "reaction": "부담스러워했지만 매주 확인에는 동의했다.",
+   "outcome": "mixed",
+   "outcomeDetail": "두 분기 만에 목표를 달성했으나 주간 확인 부담을 호소해 격주로 조정했다.",
+   "lesson": "확인 간격을 좁히면 성과는 오르지만 피로도 함께 오른다.",
+   "approachKey": "C",
+   "approach": "구조를 바꾼다",
+   "approachDesc": "대화로 풀지 않고 역할·절차·배분을 다시 짠다."
+  },
+  {
+   "id": "S28",
+   "source": "synthetic",
+   "basedOn": [
+    "R06"
+   ],
+   "type": "성과 저하",
+   "org": {
+    "industry": "IT/소프트웨어/통신",
+    "companySize": "50인 이상 ~ 300인 미만",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "성실하지만 우선순위가 맞지 않아 중요한 일이 뒤로 밀리는 팀원이 있었다.",
+   "action": "노력을 먼저 인정한 뒤 이번 주에 반드시 끝나야 하는 것 하나를 함께 지정했다.",
+   "reason": "열심히 하는 사람에게 방향을 말하려면 노력 자체를 먼저 인정해야 한다고 봤다.",
+   "dialogue": "일은 많이 하고 계신 걸 알아요. 이번 주에 이거 하나만 확실히 끝내는 걸로 가면 어떨까요?",
+   "firstLine": "일은 많이 하고 계신 걸 알아요. 이번 주에 이거 하나만 확실히 끝내는 걸로 가면 어떨까요?",
+   "reaction": "안도하며 동의했고 이후 스스로 우선순위를 물어왔다.",
+   "outcome": "positive",
+   "outcomeDetail": "중요 업무 지연이 사라졌고 팀 전체의 우선순위 공유 습관으로 확산됐다.",
+   "lesson": "노력하는 사람에게는 지적이 아니라 초점을 준다.",
+   "approachKey": "E",
+   "approach": "묻는 방식을 바꾼다",
+   "approachDesc": "질문의 범위나 순서를 바꿔 답이 나오게 한다."
+  },
+  {
+   "id": "S29",
+   "source": "synthetic",
+   "basedOn": [
+    "R09"
+   ],
+   "type": "평가·피드백",
+   "org": {
+    "industry": "금융/보험/증권",
+    "companySize": "50인 이상 ~ 300인 미만",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "피드백을 줄 때마다 방어적으로 반응하며 변명이 길어지는 팀원이 있었다.",
+   "action": "판단을 빼고 관찰한 사실만 시간순으로 제시했다. 그 뒤에 어떻게 보는지 물었다.",
+   "reason": "평가어가 섞이면 사실 확인 전에 방어가 시작된다고 봤다.",
+   "dialogue": "제가 본 걸 먼저 말씀드릴게요. 이건 제 판단이 아니라 그냥 있었던 일이에요.",
+   "firstLine": "제가 본 걸 먼저 말씀드릴게요. 이건 제 판단이 아니라 그냥 있었던 일이에요.",
+   "reaction": "처음으로 변명 없이 자기 판단 착오를 인정했다.",
+   "outcome": "positive",
+   "outcomeDetail": "이후 피드백 자리가 짧아졌고 스스로 개선안을 가져오기 시작했다.",
+   "lesson": "사실과 판단을 분리해 말하면 방어가 줄어든다.",
+   "approachKey": "E",
+   "approach": "묻는 방식을 바꾼다",
+   "approachDesc": "질문의 범위나 순서를 바꿔 답이 나오게 한다."
+  },
+  {
+   "id": "S30",
+   "source": "synthetic",
+   "basedOn": [
+    "R05"
+   ],
+   "type": "평가·피드백",
+   "org": {
+    "industry": "서비스/식음료/숙박",
+    "companySize": "10인 이상 ~ 50인 미만",
+    "teamSize": "5인 미만"
+   },
+   "situation": "실수를 지적하면 자기 책임이 아니라고 즉시 선을 긋는 팀원이 있었다.",
+   "action": "책임 소재 논의를 멈추고 다음에 같은 상황이 오면 무엇을 다르게 할지만 물었다.",
+   "reason": "책임을 다투면 끝이 없고 개선은 되지 않는다고 봤다.",
+   "dialogue": "누구 책임인지는 일단 두고요, 다음에 같은 상황이면 뭘 다르게 해보시겠어요?",
+   "firstLine": "누구 책임인지는 일단 두고요, 다음에 같은 상황이면 뭘 다르게 해보시겠어요?",
+   "reaction": "구체적인 대안을 하나 제시했지만 여전히 자기 잘못은 인정하지 않았다.",
+   "outcome": "mixed",
+   "outcomeDetail": "행동은 개선됐으나 팀 내 다른 구성원들은 사과가 없었다는 점에 불만을 가졌다.",
+   "lesson": "행동 개선과 책임 인정은 별개다. 하나만 얻을 때도 있다.",
+   "approachKey": "E",
+   "approach": "묻는 방식을 바꾼다",
+   "approachDesc": "질문의 범위나 순서를 바꿔 답이 나오게 한다."
+  },
+  {
+   "id": "S31",
+   "source": "synthetic",
+   "basedOn": [
+    "R01"
+   ],
+   "type": "평가·피드백",
+   "org": {
+    "industry": "공공/행정/비영리",
+    "companySize": "50인 이상 ~ 300인 미만",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "피드백 후 아무 말 없이 수용하는 팀원이 있었는데 실제로 이해했는지 확인되지 않았다.",
+   "action": "면담 마지막에 정리한 내용을 본인 말로 다시 말해달라고 요청했다.",
+   "reason": "침묵이 동의인지 회피인지 구분되지 않았다.",
+   "dialogue": "제가 말씀드린 걸 어떻게 이해하셨는지 한번 말씀해주실 수 있을까요?",
+   "firstLine": "제가 말씀드린 걸 어떻게 이해하셨는지 한번 말씀해주실 수 있을까요?",
+   "reaction": "본인 말로 정리하는 과정에서 두 가지를 잘못 이해했다는 점이 드러났다.",
+   "outcome": "positive",
+   "outcomeDetail": "오해가 즉시 정정됐고, 이후 면담마다 같은 방식을 적용해 반복 피드백이 줄었다.",
+   "lesson": "고개를 끄덕이는 것과 이해한 것은 다르다.",
+   "approachKey": "E",
+   "approach": "묻는 방식을 바꾼다",
+   "approachDesc": "질문의 범위나 순서를 바꿔 답이 나오게 한다."
+  },
+  {
+   "id": "S32",
+   "source": "synthetic",
+   "basedOn": [
+    "R08"
+   ],
+   "type": "평가·피드백",
+   "org": {
+    "industry": "유통/물류/운송/무역",
+    "companySize": "300인 이상 ~ 1,000인 미만",
+    "teamSize": "10인 이상 ~ 20인 미만"
+   },
+   "situation": "팀 회의 자리에서 특정 팀원의 업무 방식을 개선하자고 언급했다.",
+   "action": "다른 팀원들도 참고하면 좋겠다는 생각에 공개적으로 다뤘다.",
+   "reason": "같은 문제를 여러 사람이 겪고 있어 한 번에 전달하는 것이 효율적이라고 봤다.",
+   "dialogue": "이 부분은 ㅇㅇ님 사례인데, 다들 참고하시면 좋을 것 같아서요.",
+   "firstLine": "이 부분은 ㅇㅇ님 사례인데, 다들 참고하시면 좋을 것 같아서요.",
+   "reaction": "그 자리에서는 수긍했으나 회의 후 표정이 굳었고 이후 회의에서 발언하지 않았다.",
+   "outcome": "negative",
+   "outcomeDetail": "해당 팀원의 회의 참여가 사라졌고, 다른 팀원들도 자기 사례가 공개될까 봐 실수를 숨기기 시작했다.",
+   "lesson": "효율을 위해 공개하면 그 자리 전체가 닫힌다.",
+   "approachKey": "B",
+   "approach": "기준을 먼저 말한다",
+   "approachDesc": "사실·규칙·기대치를 먼저 제시하고 시작."
+  },
+  {
+   "id": "S33",
+   "source": "synthetic",
+   "basedOn": [
+    "R07"
+   ],
+   "type": "평가·피드백",
+   "org": {
+    "industry": "제조/생산/화학",
+    "companySize": "50인 이상 ~ 300인 미만",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "개선하겠다고 말한 뒤 두 달간 아무 변화가 없는 팀원이 있었다.",
+   "action": "다시 지적하는 대신 무엇을 언제까지 어떻게 바꿀지 구체적으로 적게 했다. 확인 시점도 함께 정했다.",
+   "reason": "‘노력하겠다’는 약속은 확인할 방법이 없다고 봤다.",
+   "dialogue": "지난번에 말씀하신 걸 좀 더 구체적으로 정해볼까요? 언제 다시 볼지도 같이 정하고요.",
+   "firstLine": "지난번에 말씀하신 걸 좀 더 구체적으로 정해볼까요? 언제 다시 볼지도 같이 정하고요.",
+   "reaction": "구체화 자체에는 협조했지만 부담스러워하는 기색이 있었다.",
+   "outcome": "mixed",
+   "outcomeDetail": "정한 항목은 지켜졌으나 정하지 않은 영역에서는 변화가 없었다.",
+   "lesson": "약속은 측정 가능한 형태로 바꿔야 확인된다. 다만 적은 것만 바뀐다.",
+   "approachKey": "B",
+   "approach": "기준을 먼저 말한다",
+   "approachDesc": "사실·규칙·기대치를 먼저 제시하고 시작."
+  },
+  {
+   "id": "S34",
+   "source": "synthetic",
+   "basedOn": [
+    "R07"
+   ],
+   "type": "업무 분장",
+   "org": {
+    "industry": "IT/소프트웨어/통신",
+    "companySize": "50인 이상 ~ 300인 미만",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "일 잘하는 팀원에게 업무가 몰려 야근이 반복됐다. 본인은 괜찮다고 말했다.",
+   "action": "각자 맡은 업무를 목록으로 만들어 실제 분량을 눈에 보이게 했다. 그 자리에서 재분배했다.",
+   "reason": "본인이 괜찮다고 해도 분량이 편중돼 있어 말로는 설득이 안 된다고 봤다.",
+   "dialogue": "다들 지금 뭘 얼마나 맡고 있는지 한번 펼쳐보죠. 저도 정확히 몰라서요.",
+   "firstLine": "다들 지금 뭘 얼마나 맡고 있는지 한번 펼쳐보죠. 저도 정확히 몰라서요.",
+   "reaction": "본인은 민망해했지만 다른 팀원들이 먼저 나눠 맡겠다고 제안했다.",
+   "outcome": "positive",
+   "outcomeDetail": "야근이 줄었고 특정인 의존도가 낮아졌다. 이후 분기마다 업무량을 점검하는 절차가 생겼다.",
+   "lesson": "‘괜찮다’는 말보다 목록이 정확하다.",
+   "approachKey": "C",
+   "approach": "구조를 바꾼다",
+   "approachDesc": "대화로 풀지 않고 역할·절차·배분을 다시 짠다."
+  },
+  {
+   "id": "S35",
+   "source": "synthetic",
+   "basedOn": [
+    "R13"
+   ],
+   "type": "업무 분장",
+   "org": {
+    "industry": "공공/행정/비영리",
+    "companySize": "10인 이상 ~ 50인 미만",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "왜 자신에게만 특정 업무가 배정되는지 불만을 제기한 팀원이 있었다.",
+   "action": "배정 기준을 숨기지 않고 그대로 설명했다. 기준 중 동의하지 않는 부분을 물었다.",
+   "reason": "기준이 없어 보이면 자의적 배정으로 느껴진다고 봤다.",
+   "dialogue": "제가 어떤 기준으로 나눴는지 먼저 말씀드릴게요. 그중에 납득 안 되는 부분을 알려주세요.",
+   "firstLine": "제가 어떤 기준으로 나눴는지 먼저 말씀드릴게요. 그중에 납득 안 되는 부분을 알려주세요.",
+   "reaction": "기준 자체는 수긍했고 한 항목에 대해서만 이의를 제기했다.",
+   "outcome": "positive",
+   "outcomeDetail": "해당 항목을 조정했고 이후 배정에 대한 불만이 사라졌다. 기준을 문서로 공유하게 됐다.",
+   "lesson": "불만의 대상은 업무량이 아니라 기준의 부재일 때가 많다.",
+   "approachKey": "B",
+   "approach": "기준을 먼저 말한다",
+   "approachDesc": "사실·규칙·기대치를 먼저 제시하고 시작."
+  },
+  {
+   "id": "S36",
+   "source": "synthetic",
+   "basedOn": [
+    "R08"
+   ],
+   "type": "업무 분장",
+   "org": {
+    "industry": "서비스/식음료/숙박",
+    "companySize": "50인 이상 ~ 300인 미만",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "청소와 정리 같은 잡무를 특정 인원이 계속 맡게 되는 상황에서 불만이 나왔다.",
+   "action": "순번제를 도입해 모두가 돌아가며 맡도록 했다.",
+   "reason": "누가 맡을지 매번 정하는 것 자체가 갈등의 원인이라고 봤다.",
+   "dialogue": "이건 매번 정하는 게 더 소모적인 것 같아서, 순번으로 돌리려고 해요.",
+   "firstLine": "이건 매번 정하는 게 더 소모적인 것 같아서, 순번으로 돌리려고 해요.",
+   "reaction": "대체로 동의했으나 일부는 형평성을 계속 문제 삼았다.",
+   "outcome": "mixed",
+   "outcomeDetail": "불만은 줄었지만 순번을 빠뜨리는 사람이 생겨 결국 리더가 관리하게 됐다.",
+   "lesson": "규칙은 갈등을 줄이지만 관리 비용을 만든다.",
+   "approachKey": "C",
+   "approach": "구조를 바꾼다",
+   "approachDesc": "대화로 풀지 않고 역할·절차·배분을 다시 짠다."
+  },
+  {
+   "id": "S37",
+   "source": "synthetic",
+   "basedOn": [
+    "R08"
+   ],
+   "type": "업무 분장",
+   "org": {
+    "industry": "제조/생산/화학",
+    "companySize": "50인 이상 ~ 300인 미만",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "프로젝트 역할을 배분하며 특정 부분을 신경 써달라고 당부했으나 그 부분이 누락된 채 진행됐다.",
+   "action": "역할과 담당은 명확히 지정했고 주의사항은 구두로 당부했다.",
+   "reason": "사전에 문제 소지를 짚어두면 알아서 챙길 것이라고 봤다.",
+   "dialogue": "ㅇㅇ님은 이 부분 해주시고, 하실 때 그 부분 신경 써서 해주세요.",
+   "firstLine": "ㅇㅇ님은 이 부분 해주시고, 하실 때 그 부분 신경 써서 해주세요.",
+   "reaction": "지시한 사항은 이행했지만 신경 써달라고 한 부분은 빠뜨렸다.",
+   "outcome": "negative",
+   "outcomeDetail": "팀 규모가 작아 결국 리더가 직접 다시 처리했다. 리더의 업무만 늘었다.",
+   "lesson": "‘신경 써서’는 지시가 아니다. 확인 방법까지 정해야 지시가 된다.",
+   "approachKey": "B",
+   "approach": "기준을 먼저 말한다",
+   "approachDesc": "사실·규칙·기대치를 먼저 제시하고 시작."
+  },
+  {
+   "id": "S38",
+   "source": "synthetic",
+   "basedOn": [
+    "R02"
+   ],
+   "type": "업무 분장",
+   "org": {
+    "industry": "교육/연구/컨설팅",
+    "companySize": "50인 이상 ~ 300인 미만",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "역량이 부족하지만 자존심이 강한 팀원 때문에 다른 팀원이 직접 불만을 제기해 팀이 와해될 상황이었다.",
+   "action": "불만을 제기한 팀원을 먼저 진정시켰다. 문제 팀원의 실질 비중은 줄이되 역할의 중요성은 남기는 방식으로 재배치했다.",
+   "reason": "그냥 배제하면 불화가 심해지고 비중을 유지하면 갈등이 계속될 상황이었다.",
+   "dialogue": "ㅇㅇ님이 자료조사랑 최종 발표를 맡아주시겠어요? 마지막 발표가 제일 중요하니까요.",
+   "firstLine": "ㅇㅇ님이 자료조사랑 최종 발표를 맡아주시겠어요? 마지막 발표가 제일 중요하니까요.",
+   "reaction": "불만을 제기했던 팀원은 부담이 줄어 만족했고 문제 팀원도 자기 역할이 있다는 점에 만족했다.",
+   "outcome": "positive",
+   "outcomeDetail": "기한 안에 과제를 마무리했고 남은 구성원들도 각자 역할에 만족했다.",
+   "lesson": "배제는 갈등을 키운다. 비중은 줄이되 의미는 남긴다.",
+   "approachKey": "C",
+   "approach": "구조를 바꾼다",
+   "approachDesc": "대화로 풀지 않고 역할·절차·배분을 다시 짠다."
+  },
+  {
+   "id": "S39",
+   "source": "synthetic",
+   "basedOn": [
+    "R03"
+   ],
+   "type": "이탈 징후",
+   "org": {
+    "industry": "IT/소프트웨어/통신",
+    "companySize": "50인 이상 ~ 300인 미만",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "핵심 팀원이 면담에서 이직을 고민 중이라고 먼저 말했다.",
+   "action": "붙잡는 말을 하기 전에 무엇이 계기였는지, 지금 회사에서 해결 가능한 부분은 무엇인지 먼저 들었다.",
+   "reason": "설득부터 하면 진짜 이유를 못 듣게 된다고 봤다.",
+   "dialogue": "먼저 얘기해주셔서 고맙습니다. 어떤 게 제일 크게 걸리는지 들어보고 싶어요.",
+   "firstLine": "먼저 얘기해주셔서 고맙습니다. 어떤 게 제일 크게 걸리는지 들어보고 싶어요.",
+   "reaction": "성장 정체와 처우 두 가지를 언급했다.",
+   "outcome": "mixed",
+   "outcomeDetail": "성장 관련 요구는 프로젝트 조정으로 일부 해결했으나 처우는 권한 밖이었다. 여섯 달 뒤 이직했지만 인수인계는 원활했다.",
+   "lesson": "다 붙잡을 수는 없다. 다만 이유를 들으면 떠나는 방식이 달라진다.",
+   "approachKey": "A",
+   "approach": "사정을 먼저 듣는다",
+   "approachDesc": "원인과 맥락 확인이 먼저. 기준은 그 뒤에."
+  },
+  {
+   "id": "S40",
+   "source": "synthetic",
+   "basedOn": [
+    "R08"
+   ],
+   "type": "이탈 징후",
+   "org": {
+    "industry": "유통/물류/운송/무역",
+    "companySize": "300인 이상 ~ 1,000인 미만",
+    "teamSize": "10인 이상 ~ 20인 미만"
+   },
+   "situation": "팀원이 이직을 준비 중이라는 정황을 다른 경로로 알게 됐다.",
+   "action": "본인이 말하기 전에 먼저 언급하며 남아달라고 설득했다.",
+   "reason": "핵심 인력이라 조기에 붙잡아야 한다고 봤다.",
+   "dialogue": "혹시 다른 데 알아보고 계신가요? 저희한테 필요한 사람이라 말씀드려요.",
+   "firstLine": "혹시 다른 데 알아보고 계신가요? 저희한테 필요한 사람이라 말씀드려요.",
+   "reaction": "당황하며 부인했고 이후 대화가 형식적으로 변했다.",
+   "outcome": "negative",
+   "outcomeDetail": "한 달 뒤 사직서를 냈고 인수인계 협조가 최소한에 그쳤다. 다른 팀원들도 감시받는다고 느꼈다.",
+   "lesson": "본인이 말하지 않은 정보로 대화를 시작하면 신뢰가 먼저 무너진다.",
+   "approachKey": "F",
+   "approach": "선을 긋는다",
+   "approachDesc": "경고·거절로 명확한 경계를 만든다."
+  },
+  {
+   "id": "S41",
+   "source": "synthetic",
+   "basedOn": [
+    "R04"
+   ],
+   "type": "과부하",
+   "org": {
+    "industry": "교육/연구/컨설팅",
+    "companySize": "1,000인 이상",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "성과가 높은 팀원이 소진 징후를 보였다. 본인은 문제없다고 말했다.",
+   "action": "업무를 빼는 대신 어떤 일이 가장 소모적인지 물었다. 그 항목을 다른 방식으로 처리하도록 바꿨다.",
+   "reason": "일을 줄이면 밀려난다고 느낄 수 있어 총량보다 종류를 조정했다.",
+   "dialogue": "일을 줄이자는 건 아니고요, 지금 제일 소모적인 게 뭔지 알고 싶어요.",
+   "firstLine": "일을 줄이자는 건 아니고요, 지금 제일 소모적인 게 뭔지 알고 싶어요.",
+   "reaction": "반복 보고 업무가 가장 힘들다고 답했다.",
+   "outcome": "positive",
+   "outcomeDetail": "보고 양식을 자동화해 주당 네 시간을 줄였고 소진 징후가 사라졌다.",
+   "lesson": "총량을 줄이는 것보다 소모적인 항목 하나를 없애는 편이 낫다.",
+   "approachKey": "A",
+   "approach": "사정을 먼저 듣는다",
+   "approachDesc": "원인과 맥락 확인이 먼저. 기준은 그 뒤에."
+  },
+  {
+   "id": "S42",
+   "source": "synthetic",
+   "basedOn": [
+    "R07"
+   ],
+   "type": "이탈 징후",
+   "org": {
+    "industry": "금융/보험/증권",
+    "companySize": "50인 이상 ~ 300인 미만",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "최소한의 업무만 하고 추가 요청을 거절하는 팀원이 늘어 팀 분위기가 가라앉았다.",
+   "action": "태도를 지적하지 않고 각자가 기대받는 역할 범위를 다시 정리하는 자리를 만들었다.",
+   "reason": "기대치가 서로 다른 상태에서 태도를 문제 삼으면 반발만 살 것이라고 봤다.",
+   "dialogue": "각자 어디까지가 자기 일이라고 생각하는지 서로 좀 다른 것 같아요. 한번 맞춰볼까요?",
+   "firstLine": "각자 어디까지가 자기 일이라고 생각하는지 서로 좀 다른 것 같아요. 한번 맞춰볼까요?",
+   "reaction": "일부는 안도했고 일부는 여전히 소극적이었다.",
+   "outcome": "mixed",
+   "outcomeDetail": "기대 범위가 명확해져 갈등은 줄었지만 자발적 추가 기여는 회복되지 않았다.",
+   "lesson": "역할을 명확히 하면 갈등은 줄지만 자발성이 돌아오지는 않는다.",
+   "approachKey": "C",
+   "approach": "구조를 바꾼다",
+   "approachDesc": "대화로 풀지 않고 역할·절차·배분을 다시 짠다."
+  },
+  {
+   "id": "S43",
+   "source": "synthetic",
+   "basedOn": [
+    "R04"
+   ],
+   "type": "과부하",
+   "org": {
+    "industry": "유통/물류/운송/무역",
+    "companySize": "300인 이상 ~ 1,000인 미만",
+    "teamSize": "20인 이상 ~ 50인 미만"
+   },
+   "situation": "한여름 야외 작업이 이어지며 팀 전체가 지쳐 진도가 나가지 않았다.",
+   "action": "리더가 먼저 작업을 시작했고 중간에 아이스크림을 사서 나누며 짧게 쉬는 시간을 만들었다.",
+   "reason": "지친 상태에서 독려하는 말은 효과가 없다고 봤다.",
+   "dialogue": "다들 먹고 싶은 아이스크림 있어? 하나씩 먹으면서 좀 쉬고 하자.",
+   "firstLine": "다들 먹고 싶은 아이스크림 있어? 하나씩 먹으면서 좀 쉬고 하자.",
+   "reaction": "지쳐 있던 분위기가 눈에 띄게 살아났다.",
+   "outcome": "positive",
+   "outcomeDetail": "휴식 뒤 속도가 올라 다른 부서보다 먼저 마쳤다.",
+   "lesson": "말보다 리더가 먼저 움직이고 쉼을 주는 편이 빠를 때가 있다.",
+   "approachKey": "D",
+   "approach": "리더가 먼저 움직인다",
+   "approachDesc": "말보다 리더가 먼저 부담을 지고 움직인다."
+  },
+  {
+   "id": "S44",
+   "source": "synthetic",
+   "basedOn": [
+    "R10"
+   ],
+   "type": "과부하",
+   "org": {
+    "industry": "서비스/식음료/숙박",
+    "companySize": "1,000인 이상",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "행사 당일 예상보다 많은 인원이 몰려 접수와 입장이 동시에 지연됐다.",
+   "action": "현장을 확인한 뒤 업무를 재배치했다. 리더가 한 자리를 맡으면서 다른 자리 지원을 요청했다.",
+   "reason": "예정 시간 안에 진행하는 것이 최우선이었고 지시만으로는 움직이지 않을 상황이었다.",
+   "dialogue": "지금 접수 쪽에 사람이 몰리고 있어요. 제가 입장 안내를 맡을 테니 접수를 한 명 더 지원해주실 수 있을까요?",
+   "firstLine": "지금 접수 쪽에 사람이 몰리고 있어요. 제가 입장 안내를 맡을 테니 접수를 한 명 더 지원해주실 수 있을까요?",
+   "reaction": "동료가 즉시 접수 지원에 들어갔다.",
+   "outcome": "positive",
+   "outcomeDetail": "대기 줄이 빠르게 줄었고 이후 동료들도 현장 상황에 따라 자발적으로 업무를 조율했다.",
+   "lesson": "리더가 한 자리를 맡고 부탁하면 지시보다 빠르게 움직인다.",
+   "approachKey": "D",
+   "approach": "리더가 먼저 움직인다",
+   "approachDesc": "말보다 리더가 먼저 부담을 지고 움직인다."
+  },
+  {
+   "id": "S45",
+   "source": "synthetic",
+   "basedOn": [
+    "R06"
+   ],
+   "type": "일정·의사결정",
+   "org": {
+    "industry": "IT/소프트웨어/통신",
+    "companySize": "50인 이상 ~ 300인 미만",
+    "teamSize": "5인 미만"
+   },
+   "situation": "클라이언트의 의사결정이 늦어져 개발 일정이 계속 밀렸고 팀의 피로가 누적됐다.",
+   "action": "모든 안건을 올리는 대신 기한에 직접 걸리는 안건만 추려 결정을 요청했다. 특정 안을 추천해 설득했다.",
+   "reason": "일정이 밀릴수록 인력과 커뮤니케이션 비용이 커지고 재계약에도 영향이 있다고 봤다.",
+   "dialogue": "바쁘신 거 알지만 결정이 필요한 안건만 먼저 공유드릴 테니, 이렇게 진행하면 좋을 것 같습니다.",
+   "firstLine": "바쁘신 거 알지만 결정이 필요한 안건만 먼저 공유드릴 테니, 이렇게 진행하면 좋을 것 같습니다.",
+   "reaction": "제안한 방향에 동의했다. 다만 의사결정 지연 자체는 반복됐다.",
+   "outcome": "positive",
+   "outcomeDetail": "개발 진도가 정상화됐고 PM에 대한 신뢰가 쌓였다.",
+   "lesson": "전부 결정해달라고 하면 아무것도 오지 않는다. 잘라서 묻고 안을 제시한다.",
+   "approachKey": "E",
+   "approach": "묻는 방식을 바꾼다",
+   "approachDesc": "질문의 범위나 순서를 바꿔 답이 나오게 한다."
+  },
+  {
+   "id": "S46",
+   "source": "synthetic",
+   "basedOn": [
+    "R04"
+   ],
+   "type": "과부하",
+   "org": {
+    "industry": "공공/행정/비영리",
+    "companySize": "50인 이상 ~ 300인 미만",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "연차를 쓰기 어려운 분위기가 굳어져 팀원들이 휴가를 미루고 있었다.",
+   "action": "리더가 먼저 연차를 사용했다. 부재 중 업무 대행 체계를 미리 만들어 공유했다.",
+   "reason": "쓰라고 말하는 것만으로는 분위기가 바뀌지 않는다고 봤다.",
+   "dialogue": "제가 먼저 다음 주에 이틀 쓰려고요. 없는 동안 이렇게 돌아가면 될 것 같아요.",
+   "firstLine": "제가 먼저 다음 주에 이틀 쓰려고요. 없는 동안 이렇게 돌아가면 될 것 같아요.",
+   "reaction": "일부는 바로 연차를 신청했지만 일부는 여전히 눈치를 봤다.",
+   "outcome": "mixed",
+   "outcomeDetail": "연차 사용률이 올랐으나 특정 시기에는 여전히 아무도 쓰지 않았다.",
+   "lesson": "분위기는 지시가 아니라 선례로 바뀐다. 다만 한 번으로는 부족하다.",
+   "approachKey": "D",
+   "approach": "리더가 먼저 움직인다",
+   "approachDesc": "말보다 리더가 먼저 부담을 지고 움직인다."
+  },
+  {
+   "id": "S47",
+   "source": "synthetic",
+   "basedOn": [
+    "R01"
+   ],
+   "type": "세대 차이",
+   "org": {
+    "industry": "제조/생산/화학",
+    "companySize": "300인 이상 ~ 1,000인 미만",
+    "teamSize": "10인 이상 ~ 20인 미만"
+   },
+   "situation": "회식 참여를 꺼리는 팀원이 늘어 기존 방식을 유지하기 어려워졌다.",
+   "action": "회식을 없애는 대신 점심 시간대 모임과 저녁 회식 중 선택하도록 형식을 바꿨다.",
+   "reason": "친목 자체가 아니라 시간대와 형식이 문제일 수 있다고 봤다.",
+   "dialogue": "저녁이 부담이신 분들도 있는 것 같아서, 점심으로 하는 것도 같이 열어두려고요.",
+   "firstLine": "저녁이 부담이신 분들도 있는 것 같아서, 점심으로 하는 것도 같이 열어두려고요.",
+   "reaction": "점심 모임 참여율이 저녁보다 높았고 대화량도 늘었다.",
+   "outcome": "positive",
+   "outcomeDetail": "팀 내 비공식 소통이 회복됐고 저녁 회식은 분기 한 번으로 줄었다.",
+   "lesson": "참여 거부는 활동 자체보다 형식에 대한 거부일 수 있다.",
+   "approachKey": "C",
+   "approach": "구조를 바꾼다",
+   "approachDesc": "대화로 풀지 않고 역할·절차·배분을 다시 짠다."
+  },
+  {
+   "id": "S48",
+   "source": "synthetic",
+   "basedOn": [
+    "R13"
+   ],
+   "type": "세대 차이",
+   "org": {
+    "industry": "금융/보험/증권",
+    "companySize": "50인 이상 ~ 300인 미만",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "팀원이 사적인 질문에 불편함을 표현해 이후 대화가 조심스러워졌다.",
+   "action": "사과한 뒤 어디까지가 편한 범위인지 직접 물어 기준을 맞췄다.",
+   "reason": "짐작으로 조심하면 대화 자체가 사라질 것이라고 봤다.",
+   "dialogue": "제가 선을 넘었네요. 어디까지가 편하신지 알려주시면 그렇게 할게요.",
+   "firstLine": "제가 선을 넘었네요. 어디까지가 편하신지 알려주시면 그렇게 할게요.",
+   "reaction": "구체적으로 범위를 알려줬고 이후 대화가 오히려 편해졌다.",
+   "outcome": "positive",
+   "outcomeDetail": "업무 외 대화가 자연스럽게 회복됐고 다른 팀원들에게도 같은 방식을 적용했다.",
+   "lesson": "짐작으로 조심하는 것보다 직접 묻는 편이 관계를 살린다.",
+   "approachKey": "A",
+   "approach": "사정을 먼저 듣는다",
+   "approachDesc": "원인과 맥락 확인이 먼저. 기준은 그 뒤에."
+  },
+  {
+   "id": "S49",
+   "source": "synthetic",
+   "basedOn": [
+    "R12"
+   ],
+   "type": "세대 차이",
+   "org": {
+    "industry": "서비스/식음료/숙박",
+    "companySize": "10인 이상 ~ 50인 미만",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "선배 팀원이 후배들을 두고 세대를 일반화하는 발언을 반복해 갈등이 생겼다.",
+   "action": "발언 자체를 지적하고 앞으로 하지 말 것을 요청했다.",
+   "reason": "명확히 선을 그어야 반복되지 않는다고 봤다.",
+   "dialogue": "그런 표현은 팀 안에서는 안 하셨으면 해요.",
+   "firstLine": "그런 표현은 팀 안에서는 안 하셨으면 해요.",
+   "reaction": "표면적으로는 수용했지만 서운함을 표했고 이후 후배들과 거리를 뒀다.",
+   "outcome": "mixed",
+   "outcomeDetail": "발언은 사라졌지만 선후배 간 협업이 줄었다. 별도로 역할을 나눠 대응해야 했다.",
+   "lesson": "금지는 행동을 멈추지만 관계를 되돌리지는 않는다.",
+   "approachKey": "F",
+   "approach": "선을 긋는다",
+   "approachDesc": "경고·거절로 명확한 경계를 만든다."
+  },
+  {
+   "id": "S50",
+   "source": "synthetic",
+   "basedOn": [
+    "R02"
+   ],
+   "type": "세대 차이",
+   "org": {
+    "industry": "교육/연구/컨설팅",
+    "companySize": "50인 이상 ~ 300인 미만",
+    "teamSize": "5인 이상 ~ 10인 미만"
+   },
+   "situation": "성장 기회를 원하는 팀원과 워라밸을 중시하는 팀원 사이에서 업무 배분 기준을 정하기 어려웠다.",
+   "action": "일률적으로 나누지 않고 각자 원하는 커리어 방향을 개별적으로 확인했다. 그 내용을 배분에 반영했다.",
+   "reason": "같은 기준을 적용하면 양쪽 다 불만이 생길 상황이었다.",
+   "dialogue": "앞으로 어떤 일을 더 해보고 싶으신지 먼저 여쭤보고 나누려고 해요.",
+   "firstLine": "앞으로 어떤 일을 더 해보고 싶으신지 먼저 여쭤보고 나누려고 해요.",
+   "reaction": "대체로 협조적이었으나 일부는 자기 선택이 평가에 반영될까 걱정했다.",
+   "outcome": "mixed",
+   "outcomeDetail": "배분 불만은 줄었지만 성장을 택한 인원에게 업무가 몰리는 새로운 편중이 생겼다.",
+   "lesson": "개별화는 불만을 줄이지만 새로운 편중을 만든다. 총량 점검이 함께 필요하다.",
+   "approachKey": "A",
+   "approach": "사정을 먼저 듣는다",
+   "approachDesc": "원인과 맥락 확인이 먼저. 기준은 그 뒤에."
+  }
+ ]
+};
+</script>
+<script>
+/* ─────────────────────────────────────────────
+   현장 위주 리더십 챗봇 — 대화 엔진 v2
+   QA 시나리오 18종 대응. AI 호출 없이 규칙 기반.
+   ───────────────────────────────────────────── */
+(function(){
+
+/* ── 유형 키워드 ── */
+var TYPE_KEYWORDS = {
+  "근태": ["지각","늦","출근","조퇴","결근","병가","자리비움","무단","재택","연차","휴가","시간을 안"],
+  "업무 실수": ["실수","오류","누락","잘못","사고","오타","오기입","불량","빠뜨","틀렸","손해","손실","클레임","컴플레인","은폐","숨기"],
+  "팀원 간 갈등": ["갈등","싸움","싸워","싸우","싸운","다툼","다투","불화","험담","뒷말","마찰","냉전","충돌","사이가","트러블","앙금"],
+  "소통·회의": ["회의","침묵","말이 없","의견","공유","보고","답이 없","메신저","되묻"],
+  "성과 저하": ["성과","실적","목표치","떨어","저하","미달","동기","의욕","무기력","집중","산출물","대충","미뤄","미룬","미룹"],
+  "평가·피드백": ["평가","피드백","지적","이의","승진","고과","납득","방어","변명","반박","듣지를 않","말을 안 들"],
+  "업무 분장": ["분장","분배","배분","역할","떠넘","몰려","왜 저만","잡무","업무량","나눠"],
+  "이탈 징후": ["퇴사","이직","그만두","그만둔","사직","나간다","나가겠","떠나","붙잡"],
+  "과부하": ["야근","과부하","번아웃","소진","지쳐","힘들어","바쁘","일정이 밀","여유가"],
+  "세대 차이": ["세대","나이","요즘 애","꼰대","회식","사적","선배","후배","가치관","워라밸"],
+  "일정·의사결정": ["기한","마감","의사결정","지연","클라이언트","우선순위"],
+  "부서 간 조율": ["타 부서","부서 간","협업 부서","유관","조율"],
+  "태도": ["태도","말투","불성실","무례","성의","표정","반말","건성","삐딱","까칠","술","음주","막말","예의"],
+};
+
+/* ── 표지 ── */
+var GUESS_MARK = ["것 같","듯","느낌","보인다","보여","아마","인 것","생각이","걱정","우려","신경 쓰","눈치"];
+var GOAL_MARK  = ["원해","원합니","싶어","싶습니","했으면","바뀌","유지","회복","경고","정리하고","끝내","개선","안 했으면","바꾸고"];
+var PRIOR_MARK = ["말했","말한","얘기했","이야기했","면담","지적","언급","경고","주의","불렀","없습니다","없어요","안 했","아무것도","처음","해봤","해봤는데"];
+var WHEN_MARK  = ["주째","개월","달째","년째","매일","자주","계속","반복","번째","어제","지난","최근","오늘","이번","한 달","일주일"];
+var EMO_MARK   = ["답답","짜증","힘들","괴롭","스트레스","화가","속상","서운","막막","지친","눈물","불안","무섭"];
+
+var SCOPE_STRONG = ["날씨","뭐 먹","뭘 먹","메뉴","맛집","로또","주식","코인","여행 추천","영화 추천","노래 추천"];
+var SCOPE_CASUAL = ["점심","저녁","주식","로또","영화","여행"];
+var SCOPE_POLICY = ["횡령","해고","징계","고소","고발","법적","소송","취업규칙","근로기준법","산재","형사","배임","성희롱","괴롭힘 신고","노무"];
+var SCOPE_SELF   = ["제가 소리","내가 소리","제가 화를","내가 화를","제가 때","폭언","제가 무시","제가 욕","제가 괴롭"];
+
+var REDIRECT_MARK = ["말고","대신","보다는","아니라","아니고","그건 됐","다른 걸로","바꿔서"];
+var REJECT_MARK   = ["이미 해봤","해봤는데","효과가 없","소용없","안 통","다른 방법","다른 방식","말고 다른","별로"];
+var FOLLOWUP_MARK = ["저번에","지난번","아까","그 직원","그 팀원","말씀해주신","알려주신"];
+
+/* ── 오타 보정 ── */
+var TYPO = { "계쏙":"계속","햬요":"해요","헤요":"해요","됬":"됐","안되":"안 되","할려":"하려","어떻해":"어떻게" };
+function fix(t){
+  var s = String(t || "");
+  s = s.replace(/[ㄱ-ㅎㅏ-ㅣ]+/g, "");          // 낱자 제거 (직ㅇ원 → 직원)
+  Object.keys(TYPO).forEach(function(k){ s = s.split(k).join(TYPO[k]); });
+  return s;
+}
+function norm(s){ return fix(s).replace(/\s+/g," ").trim(); }
+function has(t, arr){ return arr.some(function(k){ return t.indexOf(k) !== -1; }); }
+
+/* ── 개인정보 ── */
+var PHONE = /01[016789][-\s]?\d{3,4}[-\s]?\d{4}/g;
+var NAMED = /([가-힣]{2,4})\s?(사원|주임|대리|과장|차장|부장|팀장|이사|님|씨)/g;
+/* 일반명사는 이름이 아니다 */
+var NOT_NAME = ["신입","부하","우리","저희","해당","다른","모든","일부","전체","경력","기존","현재",
+                "새로","막내","선임","후임","중간","담당","실무","현장","영업","개발","기획","인사"];
+function isName(g){ return NOT_NAME.indexOf(g) === -1 && !/^(그|이|저)$/.test(g); }
+function findPII(text){
+  var t = String(text||""), out = [], m;
+  PHONE.lastIndex = 0; NAMED.lastIndex = 0;
+  if(PHONE.test(t)) out.push("전화번호");
+  PHONE.lastIndex = 0;
+  while((m = NAMED.exec(t)) !== null){
+    if(isName(m[1])){ out.push("이름·직급"); break; }
+  }
+  NAMED.lastIndex = 0;
+  return out;
+}
+function maskPII(text){
+  return String(text||"")
+    .replace(PHONE, "***-****-****")
+    .replace(NAMED, function(all, g1, g2){ return isName(g1) ? "○○ " + g2 : all; });
+}
+
+/* ── 유형 판정 ── */
+function detectType(text){
+  var t = norm(text);
+  return Object.keys(TYPE_KEYWORDS).map(function(type){
+    var n = 0;
+    TYPE_KEYWORDS[type].forEach(function(k){ if(t.indexOf(k) !== -1) n++; });
+    return { type:type, n:n };
+  }).filter(function(x){ return x.n > 0; }).sort(function(a,b){ return b.n - a.n; });
+}
+
+/* ── 입력 유효성 ── */
+function isLong(raw){ return String(raw||"").trim().length > 400; }
+
+function inputKind(raw){
+  var s = String(raw||"").trim();
+  if(!s) return "empty";
+  if(/^[0-9\s]+$/.test(s)) return "numeric";
+  if(!/[가-힣a-zA-Z]/.test(s)) return "symbol";
+  if(fix(s).replace(/[^가-힣a-zA-Z]/g,"").length < 4) return "tooShort";
+  return "ok";
+}
+
+/* ── 모순 탐지 ── */
+function findConflict(text){
+  var t = norm(text);
+  var isNew = /신입|입사한 지|들어온 지|새로 온|온 지/.test(t);
+  var yrs = t.match(/(\d+)\s*년/);
+  if(isNew && yrs && parseInt(yrs[1],10) >= 2)
+    return "신입이라고 하셨는데 " + yrs[1] + "년 경력도 함께 적어주셨어요. 경력직으로 입사한 분일까요, 아니면 다른 분 이야기일까요?";
+  var wk = t.match(/(\d+)\s*(주|개월)/);
+  if(wk && /오래|계속 해온|쭉/.test(t) && parseInt(wk[1],10) <= 4)
+    return "합류한 지 얼마 안 됐다고 하셨는데 오래 해온 업무라는 말씀도 있어요. 어느 쪽인지 알려주시면 사례를 더 정확히 찾을 수 있어요.";
+  return null;
+}
+
+/* ── 슬롯 ── */
+function slots(text){
+  var t = norm(text);
+  return {
+    type:  detectType(t).length > 0,
+    when:  has(t, WHEN_MARK) || /\d/.test(t),
+    prior: has(t, PRIOR_MARK),
+    goal:  has(t, GOAL_MARK),
+  };
+}
+function filled(s){ return ["type","when","prior","goal"].filter(function(k){ return s[k]; }).length; }
+
+/* ── 의도 분류 ── */
+function classify(raw, story){
+  var kind = inputKind(raw);
+  if(kind !== "ok") return { intent: kind };
+
+  var t = norm(raw), all = norm(story + " " + raw);
+
+  if(has(t, SCOPE_SELF))   return { intent:"scopeSelf" };
+  if(has(t, SCOPE_POLICY)) return { intent:"scopePolicy" };
+  if(has(t, SCOPE_STRONG)) return { intent:"scopeCasual" };
+  if(has(t, SCOPE_CASUAL) && !detectType(t).length) return { intent:"scopeCasual" };
+
+  if(has(t, REJECT_MARK) && story)   return { intent:"reject" };
+  if(has(t, REDIRECT_MARK))          return { intent:"redirect" };
+  if(has(t, FOLLOWUP_MARK) && story) return { intent:"followup" };
+
+  var conflict = findConflict(all);
+  if(conflict) return { intent:"conflict", msg:conflict };
+
+  var types = detectType(all);
+  if(types.length >= 3 || (types.length >= 2 && types[0].n >= 2 && types[1].n >= 2))
+    return { intent:"multi", types: types.slice(0,3) };
+
+  var emo = has(t, EMO_MARK) && detectType(t).length === 0;
+  if(emo) return { intent:"emotionOnly" };
+
+  return { intent:"normal" };
+}
+
+/* ── 되물을 것 ── */
+var ASKS = {
+  type:  "어떤 일이 있었는지 조금만 더 들려주실 수 있을까요? 상황이 잡혀야 비슷한 사례를 찾을 수 있어요.",
+  when:  "언제부터, 얼마나 자주 있었나요? 기간이나 횟수가 있으면 훨씬 정확하게 찾을 수 있어요.",
+  prior: "지금까지 이 건으로 따로 말씀하신 적이 있으세요? 없으면 “없다”고만 하셔도 괜찮아요.",
+  goal:  "이 대화가 끝났을 때 어떤 상태이길 원하세요? 행동만 바뀌면 되는지, 관계도 같이 챙기고 싶은지에 따라 첫 문장이 달라져요.",
+};
+function nextAsk(text, asked){
+  var s = slots(text), order = ["type","when","prior","goal"];
+  for(var i=0;i<order.length;i++){
+    if(!s[order[i]] && asked.indexOf(order[i]) === -1) return { key:order[i], q:ASKS[order[i]] };
+  }
+  return null;
+}
+
+/* ── 공감 한 줄 ── */
+var EMPATHY = {
+  "근태": "반복되는 근태는 말 꺼내는 타이밍을 놓치기 쉬워서 더 어렵죠.",
+  "태도": "태도 이야기는 사람 자체를 지적하는 것처럼 들릴까 봐 조심스럽죠.",
+  "업무 실수": "실수를 다루는 건 다음에도 바로 보고할지가 걸려 있어서 신중해지죠.",
+  "팀원 간 갈등": "가운데서 조율하는 자리가 제일 소모적이죠.",
+  "소통·회의": "말이 안 오가는 팀은 원인 찾기부터 막막하죠.",
+  "성과 저하": "잘하던 사람이 달라지면 어떻게 물어야 할지 애매하죠.",
+  "평가·피드백": "받아들이지 않는 상대에게 피드백하는 건 매번 부담이죠.",
+  "업무 분장": "일 잘하는 사람에게 몰리는 구조는 말로만 바꾸기 어렵죠.",
+  "이탈 징후": "붙잡고 싶은 마음과 보내야 하는 판단이 같이 오죠.",
+  "과부하": "다들 지쳐 있을 때는 독려도 부담이 되죠.",
+  "세대 차이": "서로 악의가 없는데 어긋나는 경우라 더 조심스럽죠.",
+};
+function empathy(text){
+  var ty = detectType(text)[0];
+  return (ty && EMPATHY[ty.type]) || "말을 꺼내야 하는데 첫 문장이 안 떠오르는 상황, 자주 있죠.";
+}
+
+/* ── 사례 검색 ── */
+function findCases(text, excludeApproach, excludeIds){
+  var typeScores = detectType(text);
+  if(!typeScores.length) return { type:null, matched:[] };
+  excludeApproach = excludeApproach || [];
+  excludeIds = excludeIds || [];
+
+  function collect(depth){
+    var allow = {};
+    typeScores.slice(0, depth).forEach(function(x,i){ allow[x.type] = i === 0 ? x.n * 10 : 10; });
+    var t = norm(text);
+    return window.CASES.cases.map(function(c){
+      if(!(c.type in allow)) return { c:c, s:0 };
+      if(excludeApproach.indexOf(c.approachKey) !== -1) return { c:c, s:0 };
+      if(excludeIds.indexOf(c.id) !== -1) return { c:c, s:0 };
+      var sc = allow[c.type];
+      (TYPE_KEYWORDS[c.type] || []).forEach(function(k){
+        if(t.indexOf(k) !== -1 && (c.situation.indexOf(k) !== -1 || c.action.indexOf(k) !== -1)) sc += 3;
+      });
+      if(c.source === "real") sc += 2;
+      return { c:c, s:sc };
+    }).filter(function(x){ return x.s >= 10; })
+      .sort(function(a,b){ return b.s - a.s; })
+      .map(function(x){ return x.c; });
+  }
+  var m = collect(1);
+  if(m.length < 3 && typeScores.length > 1) m = collect(2);
+  return { type: typeScores[0].type, matched: m };
+}
+
+/* 유형을 외부에서 지정해 검색 (API가 판정한 유형 사용) */
+function findCasesByType(type, query, excludeApproach, excludeIds){
+  if(!type) return findCases(query || "", excludeApproach, excludeIds);
+  excludeApproach = excludeApproach || []; excludeIds = excludeIds || [];
+  var t = norm(query || "");
+  var matched = window.CASES.cases.map(function(c){
+    if(c.type !== type) return { c:c, s:0 };
+    if(excludeApproach.indexOf(c.approachKey) !== -1) return { c:c, s:0 };
+    if(excludeIds.indexOf(c.id) !== -1) return { c:c, s:0 };
+    var sc = 10;
+    (TYPE_KEYWORDS[type] || []).forEach(function(k){
+      if(t.indexOf(k) !== -1 && (c.situation.indexOf(k) !== -1 || c.action.indexOf(k) !== -1)) sc += 3;
+    });
+    if(c.source === "real") sc += 2;
+    return { c:c, s:sc };
+  }).filter(function(x){ return x.s >= 10; })
+    .sort(function(a,b){ return b.s - a.s; })
+    .map(function(x){ return x.c; });
+  return { type: type, matched: matched };
+}
+
+function outcomeLabel(o){
+  return o === "positive" ? "개선됨" : o === "negative" ? "악화됨" : "절반만 해결";
+}
+
+/* ── 접근 방식별 묶기 ── */
+function buildOptions(matched, goalText){
+  var groups = {};
+  matched.forEach(function(c){
+    var k = c.approachKey || "Z";
+    if(!groups[k]) groups[k] = [];
+    groups[k].push(c);
+  });
+  var wantsRelation = /관계|사이|서운|어색|상처|유지/.test(norm(goalText || ""));
+
+  var opts = Object.keys(groups).map(function(k){
+    var list = groups[k], rep = list[0];
+    var pos = list.filter(function(c){ return c.outcome === "positive"; }).length;
+    var neg = list.filter(function(c){ return c.outcome === "negative"; }).length;
+    var tone = "amber", note = "";
+    if(pos > neg && pos >= Math.ceil(list.length/2)) tone = "mint";
+    else if(neg >= pos && neg > 0) tone = "coral";
+    if(wantsRelation && neg > pos){
+      tone = "coral";
+      note = "관계를 지키고 싶다고 하셨는데, 이 방식은 그 목표와 어긋난 사례가 더 많았어요.";
+    }
+    return {
+      key:k, approach:rep.approach, desc:rep.approachDesc, tone:tone, note:note,
+      rep:rep, cases:list, count:list.length, pos:pos, neg:neg,
+      basis: list.length === 1
+        ? "유사 사례 1건 · " + outcomeLabel(rep.outcome)
+        : "유사 사례 " + list.length + "건 중 " + pos + "건 개선" + (neg ? " · " + neg + "건 악화" : ""),
+      score: list.length * 10 + pos * 3,
+    };
+  });
+  opts.sort(function(a,b){
+    if((a.tone === "coral") !== (b.tone === "coral")) return a.tone === "coral" ? 1 : -1;
+    return b.score - a.score;
+  });
+  return opts.slice(0,3);
+}
+
+var POINTS = {
+  "근태":"지각 자체보다, 그동안 공식적으로 다뤄지지 않았다는 점이 핵심입니다. 팀원에게는 묵인으로 읽혔을 수 있어요.",
+  "업무 실수":"실수 직후의 첫 반응이 다음에도 바로 보고할지를 결정합니다.",
+  "팀원 간 갈등":"합동 자리를 먼저 만들면 방어가 시작됩니다. 개별로 입장을 먼저 확인해야 합니다.",
+  "소통·회의":"말이 없는 건 의견이 없어서가 아니라 답의 범위가 넓어서일 수 있습니다.",
+  "성과 저하":"갑작스러운 성과 하락은 역량이 아니라 상황일 가능성이 높습니다.",
+  "평가·피드백":"평가어가 섞이면 사실 확인 전에 방어가 시작됩니다.",
+  "업무 분장":"불만의 대상이 업무량이 아니라 배분 기준의 부재일 때가 많습니다.",
+  "이탈 징후":"설득부터 하면 진짜 이유를 듣지 못합니다.",
+  "과부하":"총량을 줄이는 것보다 가장 소모적인 항목 하나를 없애는 편이 낫습니다.",
+  "세대 차이":"참여 거부가 활동 자체가 아니라 형식에 대한 거부일 수 있습니다.",
+  "일정·의사결정":"전부 결정해달라고 하면 아무것도 오지 않습니다. 잘라서 물어야 합니다.",
+  "부서 간 조율":"들어줄 수 없는 요구일수록 공감이 먼저입니다.",
+  "태도":"인물 평가로 시작하면 방어만 남습니다. 구체적인 장면이 필요합니다.",
+};
+function makePoint(type, matched){
+  return POINTS[type] || (matched[0] ? matched[0].lesson : "");
+}
+
+/* 사실만 추출 (해석은 결과에 노출하지 않음) */
+function factsOf(text){
+  return norm(text).split(/[.!?。]\s*|\n+/).map(function(s){ return s.trim(); })
+    .filter(function(s){ return s.length > 4 && !has(s, GUESS_MARK); })
+    .slice(0, 4);
+}
+
+window.ENGINE = {
+  norm:norm, fix:fix, isLong:isLong, detectType:detectType, inputKind:inputKind, classify:classify,
+  slots:slots, filled:filled, nextAsk:nextAsk, empathy:empathy,
+  findCases:findCases, findCasesByType:findCasesByType, buildOptions:buildOptions, makePoint:makePoint,
+  outcomeLabel:outcomeLabel, factsOf:factsOf, findPII:findPII, maskPII:maskPII,
+  TYPE_KEYWORDS:TYPE_KEYWORDS,
+};
+})();
+
+</script>
+<script>
+const IS_TOUCH = ("ontouchstart" in window) || navigator.maxTouchPoints > 0;
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const E = () => window.ENGINE;
+
+const EXAMPLES = [
+  "팀원이 3주째 지각을 해요",
+  "두 팀원이 서로 일을 미뤄요",
+  "피드백을 하면 늘 변명부터 해요",
+  "잘하던 팀원 성과가 갑자기 떨어졌어요",
+];
+
+const PRINCIPLES = [
+  ["관찰한 것만 먼저","사실과 해석을 섞지 않고 본 것만 말합니다"],
+  ["첫 문장에 평가어 빼기","“요즘 왜 그래요”는 이미 평가입니다"],
+  ["기준보다 사정을 먼저","순서가 방어 여부를 가릅니다"],
+];
+
+let convo = [], apiDown = false, aiType = null, aiQuery = "";
+let view = "land", msgs = [], story = "", asked = [], typing = false,
+    done = false, openId = null, result = null,
+    usedApproach = [], usedIds = [], lastFocus = "";
+
+/* ───────── 렌더 ───────── */
+function render(){
+  const m = $("#main");
+  $("#composer").classList.toggle("hidden", view !== "chat");
+  $("#foot").classList.toggle("hidden", view !== "land");
+  $("#restart").style.visibility = view === "land" ? "hidden" : "visible";
+
+  if(view === "land")        m.innerHTML = landHTML();
+  else if(view === "chat")   m.innerHTML = `<div class="wrap" style="padding-top:8px">${chatHTML()}</div>`;
+  else if(view === "loading")m.innerHTML = `<div class="wrap"><div class="load"><div class="spinner"></div><div class="t">비슷한 상황을 찾는 중이에요</div></div></div>`;
+  else                       m.innerHTML = `<div class="wrap">${resultHTML()}</div>`;
+
+  bind();
+  if(view === "chat" || view === "result") m.scrollTop = m.scrollHeight;
+  sync();
+}
+
+function landHTML(){
+  return `<div class="land">
+    <div class="hi">현장 위주 리더십 챗봇</div>
+    <h1>어려운 대화를 앞두고<br><span class="g">첫 문장</span>이 막혔다면</h1>
+    <p class="lead">비슷한 상황을 겪은 팀장들이 실제로 어떻게 말했고,<br>그래서 어떻게 됐는지 보여드릴게요.</p>
+
+    <div class="kit">
+      <p>이런 내용을 함께 적어주시면 더 깊이 같이 고민할 수 있어요 ✨</p>
+      <ul>
+        <li><i>🗓️</i><span>무슨 일이 있었는지 — 언제부터, 얼마나 자주</span></li>
+        <li><i>💬</i><span>지금까지 어떻게 하셨는지</span></li>
+        <li><i>🎯</i><span>대화가 끝나면 어떤 상태이길 원하시는지</span></li>
+      </ul>
+    </div>
+
+    <div class="bigbox">
+      <textarea id="land-draft" rows="2" placeholder="어떤 상황인지 편하게 적어주세요"></textarea>
+      <button class="go" id="land-go">↑</button>
+    </div>
+    <div class="exs">${EXAMPLES.map(t=>`<button data-ex="${esc(t)}">${esc(t)}</button>`).join("")}</div>
+  </div>`;
+}
+
+function chatHTML(){
+  let h = "";
+  msgs.forEach((x,i)=>{
+    if(x.who === "bot"){
+      h += `<div class="row"><span class="av">L</span><div class="bot">${esc(x.text)}</div></div>`;
+      if(x.chips && i === msgs.length-1 && !typing)
+        h += `<div class="chips">${x.chips.map((c,j)=>`<button data-chip="${j}">${esc(c.label)}</button>`).join("")}</div>`;
+    } else {
+      h += `<div class="me-row"><div class="me">${esc(x.text)}</div></div>`;
+    }
+  });
+  if(typing) h += `<div class="row"><span style="width:28px;flex-shrink:0"></span><div class="typing"><i></i><i></i><i></i></div></div>`;
+  return h;
+}
+
+function resultHTML(){
+  const r = result;
+  let h = `<div class="card hero">
+    <div class="eb">지금 상황</div>
+    <div class="pt">${esc(r.point)}</div>
+    ${r.type ? `<span class="tag">${esc(r.type)}</span>` : ""}
+    ${r.facts.length ? `<div class="dv"><h5>적어주신 내용에서</h5>${r.facts.map(f=>`<p>· ${esc(f)}</p>`).join("")}</div>` : ""}
+  </div>`;
+
+  if(!r.options.length){
+    h += `<div class="card soft"><b>딱 맞는 사례가 아직 없어요</b>
+      <p>비슷한 조건의 사례가 쌓이면 실제 대응과 결과를 보여드릴게요. 지금은 원칙만 정리해 드립니다.</p></div>
+      <div class="sect"><b>일반 원칙</b><span></span></div>
+      <div class="card">${PRINCIPLES.map(([t,d])=>`<div class="pr"><b>${t}</b><p>${d}</p></div>`).join("")}</div>
+      <div class="card hrbox"><b>사내 HR 채널도 함께 확인해보세요</b>
+        <p>반복되거나 규정이 얽힌 사안은 이 도구만으로 판단하지 않는 편이 낫습니다.</p></div>`;
+  } else {
+    h += `<div class="sect"><b>무엇을 먼저 하느냐에 따라</b><span>유사 사례 ${r.total}건 기준</span></div>`;
+    h += r.options.map(optHTML).join("");
+  }
+
+  h += `<div class="card contrib" style="margin-top:18px"><b>대화가 끝나면 결과를 남겨주세요</b>
+    <p>어떻게 말했고 어떻게 됐는지가 다음 팀장에게 사례가 됩니다.</p></div>
+    <p class="src">현장 리더들에게 수집한 사례와 이를 바탕으로 보강한 사례를 함께 사용합니다.</p>
+    <div class="actions">
+      <button id="more">다른 방법도 볼래요</button>
+      <button class="pri" id="again">새 상황 물어보기</button>
+    </div>`;
+  return h;
+}
+
+function optHTML(o){
+  const c = o.rep, on = openId === o.key;
+  const others = o.cases.slice(1,4);
+  return `<div class="card opt${on?" on":""}">
+    <button data-opt="${o.key}">
+      <div class="tags"><span class="tag ${o.tone}">${esc(o.approach)}</span><span class="basis">${esc(o.basis)}</span></div>
+      <div class="head"><b>${esc(c.lesson)}</b><span class="chev">⌄</span></div>
+      <div class="adesc">${esc(o.desc)}</div>
+    </button>
+    ${on ? `<div class="body">
+      ${o.note ? `<div class="note">${esc(o.note)}</div>` : ""}
+      <div class="first">
+        <div class="top"><span class="lbl">이 리더가 실제로 한 말</span>
+          <button class="copy" data-copy="${esc(c.firstLine)}">복사</button></div>
+        <div class="txt">“${esc(c.firstLine)}”</div>
+      </div>
+      <div class="stat">
+        <span>${esc(c.org.industry.split("/")[0])}</span>
+        <span>${esc(c.org.companySize)}</span>
+        <span>팀 ${esc(c.org.teamSize)}</span>
+      </div>
+      <div class="kv"><b>어떤 상황이었나</b><p>${esc(c.situation)}</p></div>
+      <div class="kv"><b>어떻게 했나</b><p>${esc(c.action)}</p></div>
+      ${c.reason ? `<div class="kv"><b>왜 그렇게 했나</b><p>${esc(c.reason)}</p></div>` : ""}
+      <div class="kv"><b>팀원의 반응</b><p>${esc(c.reaction)}</p></div>
+      <div class="kv"><b>그래서 어떻게 됐나</b><p>${esc(c.outcomeDetail)}</p></div>
+      ${others.length ? `<div class="more"><h6>같은 방식을 쓴 다른 사례</h6>
+        ${others.map(x=>`<div class="mini"><b>${esc(E().outcomeLabel(x.outcome))}</b> · ${esc(x.lesson)}</div>`).join("")}</div>` : ""}
+    </div>` : ""}
+  </div>`;
+}
+
+/* ───────── 이벤트 ───────── */
+function bind(){
+  const lg = $("#land-go"), ld = $("#land-draft");
+  if(ld){
+    ld.oninput = ()=>{ lg.classList.toggle("on", !!ld.value.length); };
+    ld.onkeydown = e=>{ if(e.key==="Enter" && !e.shiftKey && !IS_TOUCH){ e.preventDefault(); start(ld.value); } };
+    lg.onclick = ()=> start(ld.value);
+    document.querySelectorAll("[data-ex]").forEach(b=>{ b.onclick = ()=> start(b.dataset.ex); });
+    setTimeout(()=>{ if(!IS_TOUCH) ld.focus(); }, 60);
+  }
+  document.querySelectorAll("[data-chip]").forEach(b=>{
+    b.onclick = ()=>{
+      const last = msgs[msgs.length-1];
+      const c = last.chips[+b.dataset.chip];
+      last.chips = null;
+      if(c.send){ push("me", c.send); story += " " + c.send; }
+      if(c.focus) lastFocus = c.focus;
+      c.run ? c.run() : go();
+    };
+  });
+  document.querySelectorAll("[data-opt]").forEach(b=>{
+    b.onclick = ()=>{ openId = (openId === b.dataset.opt ? null : b.dataset.opt); render(); };
+  });
+  document.querySelectorAll("[data-copy]").forEach(b=>{
+    b.onclick = e=>{
+      e.stopPropagation();
+      const ta = document.createElement("textarea");
+      ta.value = b.dataset.copy; ta.style.position="fixed"; ta.style.opacity="0";
+      document.body.appendChild(ta); ta.select();
+      try{ document.execCommand("copy"); }catch(err){}
+      document.body.removeChild(ta);
+      b.textContent = "복사됨"; b.classList.add("done");
+      setTimeout(()=>{ b.textContent="복사"; b.classList.remove("done"); }, 1600);
+    };
+  });
+  const ag = $("#again"); if(ag) ag.onclick = reset;
+  const mo = $("#more");  if(mo) mo.onclick = moreOptions;
+}
+
+function sync(){
+  const s = $("#send");
+  if(s) s.classList.toggle("on", !!$("#draft").value.trim() && !done);
+}
+
+function push(who, text, extra){ msgs.push(Object.assign({who, text}, extra||{})); }
+
+function say(text, extra, delay){
+  typing = true; render();
+  setTimeout(()=>{ typing = false; push("bot", text, extra); render(); }, delay || 950);
+}
+
+function reset(){
+  view = "land"; msgs = []; story = ""; asked = []; typing = false; done = false;
+  openId = null; result = null; usedApproach = []; usedIds = []; lastFocus = "";
+  convo = []; aiType = null; aiQuery = "";
+  render();
+}
+
+async function handle(raw){
+  const en = E();
+
+  // 입력 유효성은 로컬에서 즉시 판단 (API 호출 낭비 방지)
+  const kind = en.inputKind(raw);
+  if(kind !== "ok"){ handleLocal(raw, false); return; }
+
+  const pii = en.findPII(raw);
+  const clean = pii.length ? en.maskPII(raw) : raw;
+  push("me", clean); render();
+  story += " " + clean;
+
+  if(apiDown){ handleLocal(clean, true); return; }
+
+  convo.push({ role:"user", content: clean });
+  typing = true; render();
+
+  try{
+    const ctrl = new AbortController();
+    const timer = setTimeout(()=> ctrl.abort(), 15000);
+    const r = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages: convo }),
+      signal: ctrl.signal,
+    });
+    clearTimeout(timer);
+    if(!r.ok) throw new Error("status " + r.status);
+    const data = await r.json();
+    if(data.error) throw new Error(data.error);
+
+    typing = false;
+    convo.push({ role:"assistant", content: JSON.stringify(data) });
+
+    const note = pii.length ? "혹시 몰라 " + pii.join("·") + "는 지웠어요. 사례를 찾는 데 필요하지 않아요 🙂\n\n" : "";
+
+    if(data.status === "outOfScope"){
+      done = true; push("bot", note + data.reply); render(); return;
+    }
+    if(data.status === "ready"){
+      aiType = data.type || null;
+      aiQuery = data.query || "";
+      push("bot", note + data.reply); render();
+      setTimeout(()=> go(true), 1100);
+      return;
+    }
+    push("bot", note + data.reply, { chips: [{ label:"이대로 찾아줘", run: ()=> go() }] });
+    render();
+
+  }catch(err){
+    typing = false;
+    apiDown = true;
+    push("bot", "지금 연결이 원활하지 않아 간단한 방식으로 이어갈게요.");
+    render();
+    setTimeout(()=> handleLocal(clean, true), 900);
+  }
+}
+
+function start(text){
+  const raw = text || "";
+  if(!raw.length) return;
+  view = "chat"; render();
+  setTimeout(()=> handle(raw), 30);
+}
+
+/* ───────── 대화 처리 ───────── */
+function handleLocal(raw, pushed){
+  const en = E();
+  const kind = en.inputKind(raw);
+
+  if(kind !== "ok"){
+    if(!pushed){ push("me", raw); render(); }
+    const M = {
+      empty:   "내용이 비어 있는 것 같아요. 어떤 상황인지 한 줄이라도 적어주시면 같이 볼게요.",
+      symbol:  "글자로 적어주시면 제가 읽을 수 있어요. 어떤 일이 있었는지 편하게 적어주세요.",
+      numeric: "숫자만으로는 상황을 알기 어려워요. 무슨 일이 있었는지 문장으로 적어주시겠어요?",
+      tooShort:"조금만 더 적어주실 수 있을까요? 어떤 일이 언제부터 있었는지 알면 비슷한 사례를 찾을 수 있어요.",
+    };
+    say(M[kind], null, 700);
+    return;
+  }
+
+  const pii = en.findPII(raw);
+  const clean = pii.length ? en.maskPII(raw) : raw;
+  if(!pushed){ push("me", clean); render(); }
+
+  const c = en.classify(clean, story);
+  const piiNote = pii.length ? "혹시 몰라 " + pii.join("·") + "는 지우고 볼게요. 사례를 찾는 데 필요하지 않아요 🙂\n\n" : "";
+
+  switch(c.intent){
+    case "scopeSelf":
+      done = true;
+      say(piiNote + "이 도구는 팀장이 팀원과 나눌 대화를 준비하는 데 쓰는 도구예요.\n\n적어주신 내용은 대화 방법만으로 다루기 어려워 보입니다. 사내 HR 채널이나 고충 처리 절차를 먼저 확인해보시는 편이 안전해요.", null, 1100);
+      return;
+
+    case "scopePolicy":
+      say(piiNote + "규정이나 법적 판단이 걸린 사안은 제가 단정해서 말씀드리기 어려워요. 회사마다 취업규칙이 다르고, 잘못 안내하면 더 곤란해질 수 있어서요.\n\n그 부분은 인사팀이나 노무 담당자에게 먼저 확인하시는 게 좋겠습니다.\n\n다만 그와 별개로, 그 팀원과 나눌 대화를 어떻게 열지는 같이 볼 수 있어요. 어떤 상황인지 조금 더 들려주시겠어요?", null, 1300);
+      return;
+
+    case "scopeCasual":
+      say(piiNote + "그건 제가 도와드리기 어려운 주제예요 😅\n\n저는 팀원과 나눌 어려운 대화를 준비하는 걸 돕습니다. 지각, 업무 실수, 팀원 간 갈등, 피드백처럼요.\n\n요즘 마음에 걸리는 팀원 이야기가 있으시면 편하게 적어주세요.", null, 1000);
+      return;
+
+    case "conflict":
+      story += " " + clean;
+      say(piiNote + c.msg, null, 1100);
+      return;
+
+    case "multi": {
+      story += " " + clean;
+      const chips = c.types.map(x => ({ label: x.type, send: x.type + " 쪽부터 볼게요", focus: x.type }));
+      say(piiNote + "여러 가지가 한꺼번에 겹쳐 있네요. 그럴 때는 하나씩 푸는 게 빠릅니다.\n\n" +
+          c.types.map((x,i)=>`${i+1}. ${x.type}`).join("\n") +
+          "\n\n어느 것부터 이야기해볼까요? 제일 급한 것 하나만 골라주세요.", { chips }, 1300);
+      return;
+    }
+
+    case "redirect": {
+      story += " " + clean;
+      const ty = en.detectType(clean)[0];
+      lastFocus = ty ? ty.type : "";
+      say((ty ? ty.type + " 쪽으로 보는 거군요. " : "알겠습니다. ") +
+          "그럼 그 기준으로 다시 볼게요.\n\n" + empathyAsk(), null, 1000);
+      return;
+    }
+
+    case "reject":
+      story += " " + clean;
+      say("이미 해보셨는데 안 됐군요. 그럼 같은 방식을 또 권하는 건 의미가 없겠네요.\n\n다른 접근으로 찾아볼게요.", null, 1000);
+      setTimeout(moreOptions, 1900);
+      return;
+
+    case "followup":
+      story += " " + clean;
+      say("앞서 나눈 상황 이어서 보는 걸로 할게요.\n\n한 번 시도해보셨는데 변화가 없었다면, 방식보다 순서가 문제였을 수 있어요. 그때 어떻게 말씀하셨는지 짧게만 알려주시겠어요?", null, 1200);
+      return;
+
+    case "emotionOnly":
+      story += " " + clean;
+      say(piiNote + "그런 상황이면 답답하실 만해요. 말이 안 통한다고 느껴질 때가 제일 지치죠.\n\n조금만 더 구체적으로 여쭤볼게요. 어떤 일이 있었을 때 그렇게 느끼셨나요? 최근에 있었던 장면 하나만 떠올려 적어주시면 좋겠어요.", null, 1200);
+      return;
+  }
+
+  /* ── 일반 ── */
+  if(!pushed) story += " " + clean;
+  const sl = en.slots(story);
+  const n = en.filled(sl);
+
+  let lead = piiNote;
+  if(en.isLong(clean)){
+    const ty = en.detectType(clean)[0];
+    lead += "길게 적어주셔서 상황이 잘 보여요. 핵심만 정리하면 "
+          + (ty ? ty.type + " 문제" : "말 꺼내기 어려운 상황")
+          + "로 이해했습니다.\n\n";
+  }
+
+  if(n >= 3 || asked.length >= 3){
+    if(lead){
+      say(lead + "이 정도면 충분해요. 비슷한 사례를 찾아볼게요.", null, 900);
+      setTimeout(()=> go(true), 1200);
+    } else {
+      go();
+    }
+    return;
+  }
+
+  const ask = en.nextAsk(story, asked);
+  if(!ask){ go(); return; }
+  asked.push(ask.key);
+
+  if(!lead && msgs.filter(x=>x.who==="bot").length <= 1) lead = en.empathy(story) + "\n\n";
+  say(lead + ask.q, { chips: [{ label:"이대로 찾아줘", run: go }] }, 1150);
+}
+
+function empathyAsk(){
+  const en = E(), ask = en.nextAsk(story, asked);
+  if(ask){ asked.push(ask.key); return ask.q; }
+  return "조금 더 들려주시면 사례를 찾아볼게요.";
+}
+
+/* ───────── 결과 ───────── */
+function go(silent){
+  done = true;
+  if(!silent) say("알겠습니다. 비슷한 상황을 겪은 팀장들 사례를 찾아볼게요.", null, 700);
+  setTimeout(()=>{
+    view = "loading"; render();
+    setTimeout(()=>{ compute(false); done = false; }, 850);
+  }, silent ? 300 : 1600);
+}
+
+function compute(exclude){
+  const en = E();
+  const ex1 = exclude ? usedApproach : [];
+  const ex2 = exclude ? usedIds : [];
+  const query = (aiQuery ? aiQuery + " " : "") + (lastFocus ? lastFocus + " " : "") + story;
+  const f = aiType
+    ? en.findCasesByType(aiType, query, ex1, ex2)
+    : en.findCases(query, ex1, ex2);
+  const options = en.buildOptions(f.matched, story);
+  options.forEach(o=>{
+    if(usedApproach.indexOf(o.key) === -1) usedApproach.push(o.key);
+    if(usedIds.indexOf(o.rep.id) === -1) usedIds.push(o.rep.id);
+  });
+  result = {
+    facts: en.factsOf(story), type: f.type, options,
+    total: f.matched.length, point: en.makePoint(f.type, f.matched),
+  };
+  openId = options.length ? options[0].key : null;
+  view = "result"; render();
+}
+
+function moreOptions(){
+  const en = E();
+  const query = lastFocus ? (lastFocus + " " + story) : story;
+  const f = en.findCases(query, usedApproach, usedIds);
+  if(!f.matched.length){
+    view = "chat"; done = true; render();
+    say("같은 유형에서 보여드릴 다른 방식은 여기까지예요.\n\n상황을 조금 다르게 설명해주시면 새로 찾아볼 수 있어요. 무엇이 달랐는지 알려주시겠어요?", null, 900);
+    setTimeout(()=>{ done = false; sync(); }, 1100);
+    return;
+  }
+  view = "loading"; render();
+  setTimeout(()=>{ compute(true); }, 700);
+}
+
+/* ───────── 입력 ───────── */
+function send(){
+  try{
+    const raw = $("#draft").value;
+    if(done) return;
+    if(!raw.length) return;
+    $("#draft").value = ""; $("#draft").rows = 1;
+    handle(raw);
+  }catch(err){
+    typing = false;
+    push("bot", "처리 중 문제가 생겼어요.\n\n" + (err && err.message ? err.message : String(err)));
+    render();
+  }
+}
+$("#send").onclick = send;
+$("#restart").onclick = reset;
+$("#draft").oninput = e=>{ e.target.rows = Math.min(4, e.target.value.split("\n").length); sync(); };
+$("#draft").onkeydown = e=>{ if(e.key==="Enter" && !e.shiftKey && !IS_TOUCH){ e.preventDefault(); send(); } };
+
+reset();
+</script>
+</body>
+</html>
