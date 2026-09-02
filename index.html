@@ -2333,7 +2333,8 @@ async function handle(raw){
     const note = pii.length ? "혹시 몰라 " + pii.join("·") + "는 지웠어요. 사례를 찾는 데 필요하지 않아요 🙂\n\n" : "";
 
     if(data.status === "outOfScope"){
-      done = true; push("bot", note + data.reply); render(); return;
+      push("bot", note + data.reply, { chips: [{ label:"다른 상황 이야기하기", run: reset }] });
+      render(); return;
     }
     if(data.status === "ready"){
       aiType = data.type || null;
@@ -2387,7 +2388,6 @@ function handleLocal(raw, pushed){
 
   switch(c.intent){
     case "scopeSelf":
-      done = true;
       say(piiNote + "이 도구는 팀장이 팀원과 나눌 대화를 준비하는 데 쓰는 도구예요.\n\n적어주신 내용은 대화 방법만으로 다루기 어려워 보입니다. 사내 HR 채널이나 고충 처리 절차를 먼저 확인해보시는 편이 안전해요.", null, 1100);
       return;
 
